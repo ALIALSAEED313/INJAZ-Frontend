@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { searchServices } from "../services/serviseService";
+
 function Homepage() {
+  const [search, setSearch] = useState("");
+  const [services, setServices] = useState([]);
+  const [error, setError] = useState("");
+
   const categories = [
     "Web Development",
     "Graphic Design",
@@ -24,6 +29,22 @@ function Homepage() {
     },
   ];
 
+  async function handleSearch() {
+    if (!search.trim()) {
+      return;
+    }
+
+    try {
+      setError("");
+
+      const data = await searchServices(search);
+      setServices(data);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to search services");
+    }
+  }
+
   return (
     <main>
       <section>
@@ -36,9 +57,23 @@ function Homepage() {
             <input
               type="text"
               placeholder="What service are you looking for?"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
             />
 
-            <button>Search</button>
+            <button onClick={handleSearch}>Search</button>
+          </div>
+
+          {error && <p>{error}</p>}
+
+          <div>
+            {services.map((service) => (
+              <div key={service._id}>
+                <h3>{service.title}</h3>
+                <p>{service.description}</p>
+                <p>{service.price} BHD</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
