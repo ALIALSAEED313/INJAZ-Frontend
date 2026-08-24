@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { searchServices } from "../services/serviseService";
+import { searchServices } from "../services/serviceService";
 
 function Homepage() {
   const [search, setSearch] = useState("");
@@ -38,7 +38,7 @@ function Homepage() {
       setError("");
 
       const data = await searchServices(search);
-      setServices(data);
+      setServices(data.services);
     } catch (err) {
       console.log(err);
       setError("Failed to search services");
