@@ -7,6 +7,21 @@ function Homepage() {
     "Video Editing",
   ];
 
+  const steps = [
+    {
+      title: "Find a Service",
+      description: "Search for the service you need.",
+    },
+    {
+      title: "Choose a Freelancer",
+      description: "Compare services and choose the right freelancer.",
+    },
+    {
+      title: "Place Your Order",
+      description: "Order the service and communicate with the freelancer.",
+    },
+  ];
+
   return (
     <main>
       <section>
@@ -41,6 +56,16 @@ function Homepage() {
 
       <section>
         <h2>How It Works</h2>
+
+        <div>
+          {steps.map((step, index) => (
+            <div key={step.title}>
+              <span>{index + 1}</span>
+              <h3>{step.title}</h3>
+              <p>{step.description}</p>
+            </div>
+          ))}
+        </div>
       </section>
     </main>
   );
