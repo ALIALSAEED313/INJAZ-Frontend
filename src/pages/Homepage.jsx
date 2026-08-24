@@ -1,4 +1,12 @@
 function Homepage() {
+  const categories = [
+    "Web Development",
+    "Graphic Design",
+    "Digital Marketing",
+    "Writing",
+    "Video Editing",
+  ];
+
   return (
     <main>
       <section>
@@ -20,6 +28,15 @@ function Homepage() {
 
       <section>
         <h2>Popular Services</h2>
+
+        <div>
+          {categories.map((category) => (
+            <div key={category}>
+              <h3>{category}</h3>
+              <p>Find professional {category.toLowerCase()} services.</p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section>
