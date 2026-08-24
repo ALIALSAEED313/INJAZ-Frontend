@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { searchServices } from "../services/serviseService";
 function Homepage() {
   const categories = [
     "Web Development",
