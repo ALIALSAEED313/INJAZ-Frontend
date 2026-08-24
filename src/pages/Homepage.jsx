@@ -98,11 +98,14 @@ function Homepage() {
 
         <div>
           {categories.map((category) => (
-            <div key={category} onClick={() => handleCategory(category)}>
+            <button
+              key={category}
+              type="button"
+              onClick={() => handleCategory(category)}
+            >
               <h3>{category}</h3>
-
               <p>Find professional {category.toLowerCase()} services.</p>
-            </div>
+            </button>
           ))}
         </div>
       </section>
