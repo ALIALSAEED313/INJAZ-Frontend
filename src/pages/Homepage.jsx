@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { searchServices } from "../services/serviceService";
+import {
+  searchServices,
+  getServicesByCategory,
+} from "../services/serviceService";
 
 function Homepage() {
   const [search, setSearch] = useState("");
@@ -45,6 +48,18 @@ function Homepage() {
     }
   }
 
+  async function handleCategory(category) {
+    try {
+      setError("");
+
+      const data = await getServicesByCategory(category);
+      setServices(data.services);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load services");
+    }
+  }
+
   return (
     <main>
       <section>
@@ -83,8 +98,9 @@ function Homepage() {
 
         <div>
           {categories.map((category) => (
-            <div key={category}>
+            <div key={category} onClick={() => handleCategory(category)}>
               <h3>{category}</h3>
+
               <p>Find professional {category.toLowerCase()} services.</p>
             </div>
           ))}
@@ -98,7 +114,9 @@ function Homepage() {
           {steps.map((step, index) => (
             <div key={step.title}>
               <span>{index + 1}</span>
+
               <h3>{step.title}</h3>
+
               <p>{step.description}</p>
             </div>
           ))}
