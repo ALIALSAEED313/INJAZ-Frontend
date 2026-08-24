@@ -7,40 +7,45 @@ function Signup() {
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
     passwordConf: "",
   });
-  const [ submitting, setSubmitting ] = useState(false)
+  const [submitting, setSubmitting] = useState(false);
 
-  const { username, password, passwordConf } = formData;
+  const { username, email, password, passwordConf } = formData;
 
-  function handleChange(event){
+  function handleChange(event) {
     setError("");
-    setFormData({ ...formData, [event.target.name]: event.target.value });
-
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
   }
 
-
-  async function handleSubmit(event){
+  async function handleSubmit(event) {
     event.preventDefault();
+
     try {
-      setSubmitting(true)
+      setSubmitting(true);
       await signUp(formData);
-      navigate('/sign-in')
+      navigate("/sign-in");
     } catch (err) {
-      setError(err.response.data.message);
-      setSubmitting(false)
+      setError(err.response?.data?.message || "Sign up failed");
+      setSubmitting(false);
     }
   }
 
-  function isFormInvalid(){
-    return !(username && password && password === passwordConf);
-  };
+  function isFormInvalid() {
+    return !(username && email && password && password === passwordConf);
+  }
 
   return (
     <main>
       <h1>Sign Up</h1>
+
       <p className="error">{error}</p>
+
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">Username:</label>
@@ -53,6 +58,19 @@ function Signup() {
             required
           />
         </div>
+
+        <div>
+          <label htmlFor="email">Email:</label>
+          <input
+            type="email"
+            id="email"
+            value={email}
+            name="email"
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <div>
           <label htmlFor="password">Password:</label>
           <input
@@ -64,6 +82,7 @@ function Signup() {
             required
           />
         </div>
+
         <div>
           <label htmlFor="confirm">Confirm Password:</label>
           <input
@@ -75,12 +94,19 @@ function Signup() {
             required
           />
         </div>
+
         <div>
-          <button disabled={isFormInvalid() || submitting}>{submitting ? 'Signing up...' : 'Sign Up'}</button>
-          <button onClick={() => navigate("/")}>Cancel</button>
+          <button disabled={isFormInvalid() || submitting}>
+            {submitting ? "Signing up..." : "Sign Up"}
+          </button>
+
+          <button type="button" onClick={() => navigate("/")}>
+            Cancel
+          </button>
         </div>
       </form>
     </main>
   );
 }
+
 export default Signup;
