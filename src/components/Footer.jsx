@@ -16,6 +16,15 @@ function Footer() {
         <Link to="/privacy">Privacy Policy</Link>
         <Link to="/terms">Terms & Conditions</Link>
       </div>
+
+      <div>
+        <h3>Contact</h3>
+        <p>support@freelancehub.com</p>
+      </div>
+
+      <div>
+        <p>© 2026 FreelanceHub. All rights reserved.</p>
+      </div>
     </footer>
   );
 }
