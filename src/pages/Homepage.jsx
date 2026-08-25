@@ -1,21 +1,11 @@
 import { useState } from "react";
-import {
-  searchServices,
-  getServicesByCategory,
-} from "../services/serviceService";
+import { Link } from "react-router";
+import { searchServices } from "../services/serviceService";
 
 function Homepage() {
   const [search, setSearch] = useState("");
   const [services, setServices] = useState([]);
   const [error, setError] = useState("");
-
-  const categories = [
-    "web development",
-    "graphic design",
-    "digital marketing",
-    "writing",
-    "video editing",
-  ];
 
   const steps = [
     {
@@ -48,18 +38,6 @@ function Homepage() {
     }
   }
 
-  async function handleCategory(category) {
-    try {
-      setError("");
-
-      const data = await getServicesByCategory(category);
-      setServices(data.services);
-    } catch (err) {
-      console.log(err);
-      setError("Failed to load services");
-    }
-  }
-
   return (
     <main>
       <section>
@@ -83,11 +61,11 @@ function Homepage() {
 
           <div>
             {services.map((service) => (
-              <div key={service._id}>
+              <Link key={service._id} to={`/services/${service._id}`}>
                 <h3>{service.title}</h3>
                 <p>{service.description}</p>
                 <p>{service.price} BHD</p>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -100,9 +78,7 @@ function Homepage() {
           {steps.map((step, index) => (
             <div key={step.title}>
               <span>{index + 1}</span>
-
               <h3>{step.title}</h3>
-
               <p>{step.description}</p>
             </div>
           ))}
