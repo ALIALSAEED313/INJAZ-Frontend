@@ -10,11 +10,11 @@ function Homepage() {
   const [error, setError] = useState("");
 
   const categories = [
-    "Web Development",
-    "Graphic Design",
-    "Digital Marketing",
-    "Writing",
-    "Video Editing",
+    "web development",
+    "graphic design",
+    "digital marketing",
+    "writing",
+    "video editing",
   ];
 
   const steps = [
@@ -90,23 +90,6 @@ function Homepage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section>
-        <h2>Popular Services</h2>
-
-        <div>
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              onClick={() => handleCategory(category)}
-            >
-              <h3>{category}</h3>
-              <p>Find professional {category.toLowerCase()} services.</p>
-            </button>
-          ))}
         </div>
       </section>
 
