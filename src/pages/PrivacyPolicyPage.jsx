@@ -21,6 +21,20 @@ function PrivacyPolicyPage() {
         We use your information to provide and improve our services, manage your
         account, and allow users to connect with freelancers.
       </p>
+
+      <h2>Information Security</h2>
+
+      <p>
+        We take reasonable steps to protect your information from unauthorized
+        access, modification, or disclosure.
+      </p>
+
+      <h2>Third-Party Services</h2>
+
+      <p>
+        INJAZ may use third-party services to support features such as
+        authentication, image storage, and other platform functionality.
+      </p>
     </main>
   );
 }
