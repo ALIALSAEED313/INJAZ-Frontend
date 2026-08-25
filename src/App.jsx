@@ -27,6 +27,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/services/:id" element={<ServiceDetailsPage />} />
       </Routes>
       <Footer />
     </div>
