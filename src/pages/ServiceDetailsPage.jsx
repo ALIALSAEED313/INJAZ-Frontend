@@ -36,7 +36,13 @@ function ServiceDetailsPage() {
 
   return (
     <main>
-      <h1>Service Details</h1>
+      <h1>{service.title}</h1>
+
+      <p>{service.description}</p>
+
+      <p>Price: {service.price} BHD</p>
+
+      <p>Delivery Time: {service.deliveryTime} days</p>
     </main>
   );
 }
