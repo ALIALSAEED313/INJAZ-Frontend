@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [service, setService] = useState(null);
   const [error, setError] = useState("");
 
@@ -35,6 +37,8 @@ function ServiceDetailsPage() {
 
   return (
     <main>
+      <button onClick={() => navigate(-1)}>Back</button>
+
       <h1>{service.title}</h1>
 
       <p>{service.description}</p>
