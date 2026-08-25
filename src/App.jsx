@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import Footer from "./components/Footer";
 import ServiceDetailsPage from "./pages/ServiceDetailsPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 function App() {
   return (
     <div>
@@ -28,6 +29,7 @@ function App() {
           }
         />
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
       </Routes>
       <Footer />
     </div>
