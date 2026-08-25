@@ -3,19 +3,36 @@ import { useParams } from "react-router-dom";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
+
   const [service, setService] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function getService() {
-      const response = await fetch(`http://localhost:3000/services/${id}`);
+      try {
+        const response = await fetch(`http://localhost:3000/services/${id}`);
 
-      const data = await response.json();
+        if (!response.ok) {
+          throw new Error("Service not found");
+        }
 
-      setService(data);
+        const data = await response.json();
+        setService(data);
+      } catch (err) {
+        setError(err.message);
+      }
     }
 
     getService();
   }, [id]);
+
+  if (error) {
+    return <p>{error}</p>;
+  }
+
+  if (!service) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <main>
