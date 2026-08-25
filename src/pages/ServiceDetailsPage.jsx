@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
 
   const [service, setService] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getService() {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await fetch(`http://localhost:3000/services/${id}`);
 
         if (!response.ok) {
@@ -18,42 +21,61 @@ function ServiceDetailsPage() {
         }
 
         const data = await response.json();
+
         setService(data);
       } catch (err) {
-        setError(err.message);
+        console.log(err);
+        setError("Failed to load service");
+      } finally {
+        setLoading(false);
       }
     }
 
     getService();
   }, [id]);
 
-  if (error) {
-    return <p>{error}</p>;
+  if (loading) {
+    return <p>Loading service...</p>;
   }
 
-  if (!service) {
-    return <p>Loading...</p>;
+  if (error) {
+    return (
+      <main>
+        <p>{error}</p>
+        <Link to="/">Back to Home</Link>
+      </main>
+    );
   }
 
   return (
     <main>
-      <button onClick={() => navigate(-1)}>Back</button>
+      <Link to="/">← Back to Home</Link>
 
-      <h1>{service.title}</h1>
+      <section>
+        {service.images && service.images.length > 0 && (
+          <div>
+            {service.images.map((image, index) => (
+              <img
+                key={index}
+                src={image}
+                alt={`${service.title} ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
-      <p>{service.description}</p>
-
-      <p>Price: {service.price} BHD</p>
-
-      <p>Delivery Time: {service.deliveryTime} days</p>
-
-      {service.images && service.images.length > 0 && (
         <div>
-          {service.images.map((image, index) => (
-            <img key={index} src={image} alt={service.title} />
-          ))}
+          <h1>{service.title}</h1>
+
+          <p>{service.description}</p>
+
+          <div>
+            <h2>{service.price} BHD</h2>
+
+            <p>Delivery time: {service.deliveryTime} days</p>
+          </div>
         </div>
-      )}
+      </section>
     </main>
   );
 }
