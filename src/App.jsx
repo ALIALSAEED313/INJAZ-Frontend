@@ -12,6 +12,7 @@ import { useAuth } from "./context/AuthContext";
 import Footer from "./components/Footer";
 import ServiceDetailsPage from "./pages/ServiceDetailsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import TermsPage from "./pages/TermsPage";
 function App() {
   return (
     <div>
@@ -30,6 +31,7 @@ function App() {
         />
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
       </Routes>
       <Footer />
     </div>
