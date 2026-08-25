@@ -35,6 +35,13 @@ function PrivacyPolicyPage() {
         INJAZ may use third-party services to support features such as
         authentication, image storage, and other platform functionality.
       </p>
+
+      <h2>Contact</h2>
+
+      <p>
+        If you have questions about this Privacy Policy, please contact the
+        INJAZ team.
+      </p>
     </main>
   );
 }
