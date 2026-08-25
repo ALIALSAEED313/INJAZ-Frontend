@@ -10,6 +10,7 @@ import { getCurrentUser, logout } from "./services/authService";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { useAuth } from "./context/AuthContext";
 import Footer from "./components/Footer";
+import ServiceDetailsPage from "./pages/ServiceDetailsPage";
 function App() {
   return (
     <div>
