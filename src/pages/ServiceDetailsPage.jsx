@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
-
   const [service, setService] = useState(null);
   const [error, setError] = useState("");
 
@@ -43,6 +42,14 @@ function ServiceDetailsPage() {
       <p>Price: {service.price} BHD</p>
 
       <p>Delivery Time: {service.deliveryTime} days</p>
+
+      {service.images && service.images.length > 0 && (
+        <div>
+          {service.images.map((image, index) => (
+            <img key={index} src={image} alt={service.title} />
+          ))}
+        </div>
+      )}
     </main>
   );
 }
