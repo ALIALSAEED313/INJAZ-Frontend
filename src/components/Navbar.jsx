@@ -15,6 +15,7 @@ function Navbar() {
         {user ? (
           <>
             <Link to="/dashboard">Dashboard</Link>
+            {user.isSeller && <Link to="/services/create">Create Service</Link>}
             <Link to="/profile">
               <img
                 src={user?.avatarUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWC-v0HrKYp0-av4D0eTZv5hoIHoW35GhmKG2djTVP4Q&s'}
