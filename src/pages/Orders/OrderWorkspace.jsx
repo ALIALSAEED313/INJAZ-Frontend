@@ -28,9 +28,12 @@ function OrderWorkspace() {
                 setOrder(currentOrder)
 
                 const myUserId = localStorage.getItem('userId')
-                const participantId = currentOrder.buyer._id === myUserId
-                    ? currentOrder.seller._id
-                    : currentOrder.buyer._id
+                const buyerId = currentOrder.buyer?._id || currentOrder.buyer
+                const sellerId = currentOrder.seller?._id || currentOrder.seller
+
+                const participantId = (buyerId?.toString() === myUserId?.toString())
+                    ? sellerId
+                    : buyerId
 
                 const convRes = await axios.post('http://localhost:3000/chat/conversations',
                     { participantId },
