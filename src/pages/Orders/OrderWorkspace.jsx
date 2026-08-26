@@ -107,6 +107,10 @@ function OrderWorkspace() {
         }
     }
 
+    const myUserId = localStorage.getItem('userId')
+    const sellerId = order?.seller?._id || order?.seller
+    const isSellerUser = Boolean(sellerId && myUserId && sellerId.toString() === myUserId.toString())
+
     if (loading) return <div className='workspace-loading'>Loading Workspace ...</div>
     if (error) return <div className='workspace-error'>{error}</div>
   return (
@@ -116,12 +120,16 @@ function OrderWorkspace() {
             <h2>Order Workspace: {order?.service?.title}</h2>
             <div className='status-updater'>
                 <label>Order Status: </label>
-                <select value={order?.status} onChange={handleStatusChange} className='status-select'>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
+                {isSellerUser ? (
+                    <select value={order?.status} onChange={handleStatusChange} className='status-select'>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                ) : (
+                    <span className='status-badge'>{order?.status}</span>
+                )}
             </div>
         </div>
 

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 function ServicesPage() {
+  const { user } = useAuth();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -42,10 +44,29 @@ function ServicesPage() {
 
   return (
     <main>
-      <section>
-        <h1>All Services</h1>
+      <section style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h1>All Services</h1>
 
-        <p>Find the right freelancer for your project.</p>
+          <p>Find the right freelancer for your project.</p>
+        </div>
+
+        {user?.isSeller && (
+          <Link
+            to="/services/create"
+            className="btn-create-service"
+            style={{
+              padding: "10px 18px",
+              backgroundColor: "#0070f3",
+              color: "#fff",
+              borderRadius: "6px",
+              textDecoration: "none",
+              fontWeight: "600",
+            }}
+          >
+            + Create Service
+          </Link>
+        )}
       </section>
 
       {services.length === 0 ? (
