@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import axios from 'axios'
@@ -10,28 +9,37 @@ function UserDashboard() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    async function fetchOrders(){
-        try{
-            const token = localStorage.getItem('token')
+    useEffect(() => {
+        let isMounted = true
 
-            const response = await axios.get('http://localhost:3000/orders/my-orders',{
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            })
+        async function fetchOrders() {
+            try {
+                const token = localStorage.getItem('token')
 
-            setOrders(response.data.orders)
-            setLoading(false)
+                const response = await axios.get('http://localhost:3000/orders/my-orders', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+
+                if (!isMounted) return
+                setOrders(response.data.orders || [])
+                setLoading(false)
+            }
+            catch (err) {
+                console.error(err)
+                if (!isMounted) return
+                setError('Failed to Fetch Orders')
+                setLoading(false)
+            }
         }
-        catch(err){
-            setError('Failed to Fetch Orders')
-            setLoading(false)
-        }
-    }
 
-    useEffect(()=>{
         fetchOrders()
-    },[])
+
+        return () => {
+            isMounted = false
+        }
+    }, [])
 
     if (loading) return <div className='loading-state'>Loading ...</div>
     if (error) return <div className='error-state'>{error}</div>

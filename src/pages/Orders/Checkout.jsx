@@ -33,17 +33,20 @@ const Checkout = () => {
     try {
       const token = localStorage.getItem('token');
       
+      const sellerId = service.freelancer?._id || service.seller?._id || service.freelancer || service.seller;
+      
       const response = await axios.post('http://localhost:3000/orders', {
         serviceId: service._id,
-        sellerId: service.seller._id,
+        sellerId: sellerId,
         price: service.price
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      const newOrderId = response.data.order._id
+      const createdOrder = response.data.order || response.data.Order;
+      const newOrderId = createdOrder._id;
       navigate(`/workspace/${newOrderId}`)
-      setInvoice(response.data.order || response.data.Order);
+      setInvoice(createdOrder);
       setIsProcessing(false);
     } catch (err) {
       console.error(err);
@@ -88,7 +91,7 @@ const Checkout = () => {
         </div>
         <div className="summary-item">
           <span>Seller: </span>
-          <strong>{service.seller?.username || 'Unknown'}</strong>
+          <strong>{service.freelancer?.username || service.seller?.username || 'Unknown'}</strong>
         </div>
         <div className="summary-item total-price">
           <span>Total Price: </span>
