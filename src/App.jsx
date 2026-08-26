@@ -17,6 +17,7 @@ import EditService from "./pages/ServiceEditPage";
 import UserDashboard from "./pages/Orders/UserDashboard";
 import OrderWorkspace from "./pages/Orders/OrderWorkspace";
 import Checkout from "./pages/Orders/Checkout";
+import ProfilePage from "./pages/Profiles/Profile";
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/services/create" element={<CreateServicePage />} />
         <Route path="/services/:id/edit" element={<EditService />} />
+        <Route path="/profile/:id" element={<ProfilePage/>} />
       </Routes>
       <Footer />
     </div>
