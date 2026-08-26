@@ -96,14 +96,24 @@ function CreateServicePage() {
             <option value="">Select a category</option>
 
             <option value="web development">Web Development</option>
-
+            <option value="mobile app development">
+              Mobile App Development
+            </option>
+            <option value="software development">Software Development</option>
             <option value="graphic design">Graphic Design</option>
-
+            <option value="ui/ux design">UI/UX Design</option>
+            <option value="video & animation">Video & Animation</option>
+            <option value="photography">Photography</option>
+            <option value="writing & translation">Writing & Translation</option>
             <option value="digital marketing">Digital Marketing</option>
-
-            <option value="writing">Writing</option>
-
-            <option value="video editing">Video Editing</option>
+            <option value="social media management">
+              Social Media Management
+            </option>
+            <option value="seo">SEO</option>
+            <option value="business & consulting">Business & Consulting</option>
+            <option value="data science & ai">Data Science & AI</option>
+            <option value="music & audio">Music & Audio</option>
+            <option value="accounting & finance">Accounting & Finance</option>
           </select>
         </div>
 
