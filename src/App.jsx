@@ -14,6 +14,7 @@ import ServiceDetailsPage from "./pages/ServiceDetailsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsPage from "./pages/TermsPage";
 import CreateServicePage from "./pages/ServiceCreatePage";
+import EditService from "./pages/ServiceEditPage";
 function App() {
   return (
     <div>
@@ -34,6 +35,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/services/create" element={<CreateServicePage />} />
+        <Route path="/services/:id/edit" element={<EditService />} />
       </Routes>
       <Footer />
     </div>
