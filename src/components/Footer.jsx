@@ -4,7 +4,7 @@ function Footer() {
   return (
     <footer>
       <div>
-        <h2>FreelanceHub</h2>
+        <h2>injazFreelanceHub</h2>
         <p>Connect with skilled freelancers and get your work done.</p>
       </div>
 
@@ -19,11 +19,11 @@ function Footer() {
 
       <div>
         <h3>Contact</h3>
-        <p>support@freelancehub.com</p>
+        <p>support@injaz.com</p>
       </div>
 
       <div>
-        <p>© 2026 FreelanceHub. All rights reserved.</p>
+        <p>© 2026 InjazFreelanceHub. All rights reserved.</p>
       </div>
     </footer>
   );
