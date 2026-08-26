@@ -41,6 +41,8 @@ const Checkout = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
+      const newOrderId = response.data.order._id
+      navigate(`/workspace/${newOrderId}`)
       setInvoice(response.data.order || response.data.Order);
       setIsProcessing(false);
     } catch (err) {
