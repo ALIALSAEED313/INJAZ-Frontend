@@ -11,7 +11,9 @@ function ServiceDetailsPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [ordering, setOrdering] = useState(false);
 
+  // Get service details
   useEffect(() => {
     async function getService() {
       try {
@@ -37,6 +39,7 @@ function ServiceDetailsPage() {
     getService();
   }, [id]);
 
+  // Get current logged-in user
   useEffect(() => {
     async function getUser() {
       const token = localStorage.getItem("token");
@@ -56,6 +59,7 @@ function ServiceDetailsPage() {
     getUser();
   }, []);
 
+  // Delete service
   async function handleDelete() {
     const confirmed = window.confirm(
       "Are you sure you want to delete this service?",
@@ -93,8 +97,45 @@ function ServiceDetailsPage() {
     }
   }
 
-  function handleOrder() {
-    navigate(`/services/${id}/order`);
+  async function handleOrder() {
+    try {
+      setOrdering(true);
+      setError("");
+
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/sign-in");
+        return;
+      }
+
+      const response = await fetch("http://localhost:3000/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          serviceId: id,
+        }),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to create order");
+      }
+
+      console.log("Order created:", data);
+
+      // Go to workspace after successfully creating the order
+      navigate(`/workspace/${id}`);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to create order");
+    } finally {
+      setOrdering(false);
+    }
   }
 
   if (loading) {
@@ -105,6 +146,7 @@ function ServiceDetailsPage() {
     return (
       <main>
         <p>{error}</p>
+
         <Link to="/">Back to Home</Link>
       </main>
     );
@@ -167,8 +209,8 @@ function ServiceDetailsPage() {
               </button>
             </div>
           ) : currentUser ? (
-            <button type="button" onClick={handleOrder}>
-              Order Service
+            <button type="button" onClick={handleOrder} disabled={ordering}>
+              {ordering ? "Creating Order..." : "Order Service"}
             </button>
           ) : (
             <Link to="/sign-in">Sign In to Order</Link>
