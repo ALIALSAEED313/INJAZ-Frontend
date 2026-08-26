@@ -13,6 +13,7 @@ import ServiceDetailsPage from "./pages/ServiceDetailsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsPage from "./pages/TermsPage";
 import CreateServicePage from "./pages/ServiceCreatePage";
+import EditService from "./pages/ServiceEditPage";
 import UserDashboard from "./pages/Orders/UserDashboard";
 import OrderWorkspace from "./pages/Orders/OrderWorkspace";
 import Checkout from "./pages/Orders/Checkout";
@@ -52,6 +53,7 @@ function App() {
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/services/create" element={<CreateServicePage />} />
+        <Route path="/services/:id/edit" element={<EditService />} />
       </Routes>
       <Footer />
     </div>
