@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
+import { getCurrentUser } from "../services/authService";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [service, setService] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
@@ -35,6 +37,25 @@ function ServiceDetailsPage() {
     getService();
   }, [id]);
 
+  useEffect(() => {
+    async function getUser() {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        return;
+      }
+
+      try {
+        const user = await getCurrentUser();
+        setCurrentUser(user);
+      } catch (err) {
+        console.log("User is not logged in");
+      }
+    }
+
+    getUser();
+  }, []);
+
   async function handleDelete() {
     const confirmed = window.confirm(
       "Are you sure you want to delete this service?",
@@ -59,16 +80,21 @@ function ServiceDetailsPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => null);
+
         throw new Error(data?.message || "Failed to delete service");
       }
 
-      navigate("/");
+      navigate("/services");
     } catch (err) {
       console.error(err);
       setError(err.message || "Failed to delete service");
     } finally {
       setDeleting(false);
     }
+  }
+
+  function handleOrder() {
+    navigate(`/services/${id}/order`);
   }
 
   if (loading) {
@@ -88,9 +114,21 @@ function ServiceDetailsPage() {
     return <p>Service not found.</p>;
   }
 
+  const serviceFreelancerId =
+    typeof service.freelancer === "object"
+      ? service.freelancer?._id
+      : service.freelancer;
+
+  const currentUserId = currentUser?._id || currentUser?.id;
+
+  const isOwner =
+    currentUserId &&
+    serviceFreelancerId &&
+    String(currentUserId) === String(serviceFreelancerId);
+
   return (
     <main>
-      <Link to="/">← Back to Home</Link>
+      <Link to="/services">← Back to Services</Link>
 
       {error && <p>{error}</p>}
 
@@ -120,13 +158,21 @@ function ServiceDetailsPage() {
             <p>Delivery time: {service.deliveryTime} days</p>
           </div>
 
-          <div>
-            <Link to={`/services/${id}/edit`}>Edit Service</Link>
+          {isOwner ? (
+            <div>
+              <Link to={`/services/${id}/edit`}>Edit Service</Link>
 
-            <button type="button" onClick={handleDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete Service"}
+              <button type="button" onClick={handleDelete} disabled={deleting}>
+                {deleting ? "Deleting..." : "Delete Service"}
+              </button>
+            </div>
+          ) : currentUser ? (
+            <button type="button" onClick={handleOrder}>
+              Order Service
             </button>
-          </div>
+          ) : (
+            <Link to="/sign-in">Sign In to Order</Link>
+          )}
         </div>
       </section>
     </main>

@@ -17,6 +17,7 @@ import EditService from "./pages/ServiceEditPage";
 import UserDashboard from "./pages/Orders/UserDashboard";
 import OrderWorkspace from "./pages/Orders/OrderWorkspace";
 import Checkout from "./pages/Orders/Checkout";
+import ServicesPage from "./pages/ServicesPage";
 
 function App() {
   return (
@@ -26,7 +27,7 @@ function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/sign-up" element={<SignupPage />} />
         <Route path="/sign-in" element={<SignInPage />} />
-        
+
         <Route
           path="/dashboard"
           element={
@@ -35,25 +36,29 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
-        <Route 
-          path="/workspace/:orderId" 
+
+        <Route
+          path="/workspace/:orderId"
           element={
             <ProtectedRoute>
               <OrderWorkspace />
             </ProtectedRoute>
           }
         />
-        <Route path="/checkout/:serviceId" element={
-          <ProtectedRoute>
-            <Checkout/>
-          </ProtectedRoute>
-        }/>
+        <Route
+          path="/checkout/:serviceId"
+          element={
+            <ProtectedRoute>
+              <Checkout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/services/create" element={<CreateServicePage />} />
         <Route path="/services/:id/edit" element={<EditService />} />
+        <Route path="/services" element={<ServicesPage />} />
       </Routes>
       <Footer />
     </div>
