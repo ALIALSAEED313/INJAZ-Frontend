@@ -59,7 +59,7 @@ function ServiceDetailsPage() {
 
         setCurrentUser(user);
       } catch (err) {
-        console.log("User is not logged in");
+        console.log("User is not logged in", err);
         setCurrentUser(null);
       }
     }
