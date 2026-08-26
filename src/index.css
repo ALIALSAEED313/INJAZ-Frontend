@@ -9,7 +9,7 @@ nav a{
 .avatar-circle {
   width: 40px; 
   height: 40px;
-  border-radius: 50%; /* هذا السطر هو السر الذي يجعلها دائرة تماماً */
-  object-fit: cover;  /* هذا السطر يمنع الصورة من التمدد أو التشوه */
+  border-radius: 50%;
+  object-fit: cover; 
   cursor: pointer;
 }
