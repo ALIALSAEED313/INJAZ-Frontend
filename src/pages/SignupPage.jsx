@@ -10,10 +10,11 @@ function Signup() {
     email: "",
     password: "",
     passwordConf: "",
+    accountType: "buyer",
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const { username, email, password, passwordConf } = formData;
+  const { username, email, password, passwordConf, accountType } = formData;
 
   function handleChange(event) {
     setError("");
@@ -28,7 +29,13 @@ function Signup() {
 
     try {
       setSubmitting(true);
-      await signUp(formData);
+      await signUp({
+        username,
+        email,
+        password,
+        passwordConf,
+        isSeller: accountType === "seller",
+      });
       navigate("/sign-in");
     } catch (err) {
       setError(err.response?.data?.message || "Sign up failed");
@@ -69,6 +76,20 @@ function Signup() {
             onChange={handleChange}
             required
           />
+        </div>
+
+        <div>
+          <label htmlFor="accountType">I am joining as a:</label>
+          <select
+            id="accountType"
+            name="accountType"
+            value={accountType}
+            onChange={handleChange}
+            required
+          >
+            <option value="buyer">Buyer (Looking to hire)</option>
+            <option value="seller">Freelancer / Seller (Offering services)</option>
+          </select>
         </div>
 
         <div>

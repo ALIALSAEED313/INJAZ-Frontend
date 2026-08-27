@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState, useEffect } from 'react'
 import { useParams } from 'react-router'
 import axios from 'axios'
@@ -15,44 +14,55 @@ function OrderWorkspace() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
 
-    async function fetchOrderAndChat(){
-        try{
-            const token = localStorage.getItem('token')
-            const headers = { Authorization: `Bearer ${token}`}
+    useEffect(() => {
+        let isMounted = true
 
-            const orderRes = await axios.get(`http://localhost:3000/orders/${orderId}`, {headers})
-            const currentOrder = orderRes.data
-            setOrder(currentOrder)
+        async function fetchOrderAndChat() {
+            try {
+                const token = localStorage.getItem('token')
+                const headers = { Authorization: `Bearer ${token}` }
 
+                const orderRes = await axios.get(`http://localhost:3000/orders/${orderId}`, { headers })
+                const currentOrder = orderRes.data
+                if (!isMounted) return
+                setOrder(currentOrder)
 
-            const myUserId = localStorage.getItem('userId')
-            const participantId = currentOrder.buyer._id === myUserId
-            ? currentOrder.seller._id
-            : currentOrder.buyer._id
+                const myUserId = localStorage.getItem('userId')
+                const buyerId = currentOrder.buyer?._id || currentOrder.buyer
+                const sellerId = currentOrder.seller?._id || currentOrder.seller
 
-            const convRes = await axios.post('http://localhost:3000/chat/conversations',
-                { participantId },
-                { headers }
-            )
+                const participantId = (buyerId?.toString() === myUserId?.toString())
+                    ? sellerId
+                    : buyerId
 
-            const currentConv = convRes.data.conversation
-            setConversation(currentConv)
+                const convRes = await axios.post('http://localhost:3000/chat/conversations',
+                    { participantId },
+                    { headers }
+                )
 
-            const msgRes = await axios.get(`http://localhost:3000/chat/conversations/${currentConv._id}/messages`, { headers })
-            setMessages(msgRes.data.messages)
+                const currentConv = convRes.data.conversation
+                if (!isMounted) return
+                setConversation(currentConv)
 
-            setLoading(false)
+                const msgRes = await axios.get(`http://localhost:3000/chat/conversations/${currentConv._id}/messages`, { headers })
+                if (!isMounted) return
+                setMessages(msgRes.data.messages || [])
+                setLoading(false)
+            }
+            catch (err) {
+                console.error(err)
+                if (!isMounted) return
+                setError('Error loading workspace data.')
+                setLoading(false)
+            }
         }
-        catch(err){
-            console.error(err)
-            setError('Error loading workspace data.')
-            setLoading(false)
-        }   
-    }
 
-    useEffect(()=>{
         fetchOrderAndChat()
-    },[orderId])
+
+        return () => {
+            isMounted = false
+        }
+    }, [orderId])
 
     async function handleStatusChange(event) {
         const newStatus = event.target.value
@@ -67,7 +77,8 @@ function OrderWorkspace() {
             setOrder({...order, status: newStatus})
             alert('Order status updated successfully!')
         }
-        catch(err){
+        catch (err) {
+            console.error(err)
             alert('Failed to update status. Are you authorized?')
         }
     }
@@ -90,10 +101,15 @@ function OrderWorkspace() {
             setMessages([...messages, res.data.data])
             setNewMessage('')
         }
-        catch(err){
+        catch (err) {
+            console.error(err)
             alert('Failed to send message.')
         }
     }
+
+    const myUserId = localStorage.getItem('userId')
+    const sellerId = order?.seller?._id || order?.seller
+    const isSellerUser = Boolean(sellerId && myUserId && sellerId.toString() === myUserId.toString())
 
     if (loading) return <div className='workspace-loading'>Loading Workspace ...</div>
     if (error) return <div className='workspace-error'>{error}</div>
@@ -103,13 +119,17 @@ function OrderWorkspace() {
         <div className='order-details-header'>
             <h2>Order Workspace: {order?.service?.title}</h2>
             <div className='status-updater'>
-                <lable>Order Status: </lable>
-                <select value={order?.status} onChange={handleStatusChange} className='status-select'>
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
+                <label>Order Status: </label>
+                {isSellerUser ? (
+                    <select value={order?.status} onChange={handleStatusChange} className='status-select'>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                ) : (
+                    <span className='status-badge'>{order?.status}</span>
+                )}
             </div>
         </div>
 
