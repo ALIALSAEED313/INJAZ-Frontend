@@ -21,11 +21,17 @@ async function deleteProfile(){
     return response.data
 }
 
+async function getServicesByFreelancer(id) {
+    const response = await api.get(`/services/profile/${id}`)
+    return response.data
+}
+
 
 export {
     getProfile,
     getMyProfile,
     updateProfile,
-    deleteProfile
+    deleteProfile,
+    getServicesByFreelancer
 }
 
