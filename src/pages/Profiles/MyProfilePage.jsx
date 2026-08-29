@@ -5,7 +5,7 @@ import EditProfileForm from "../../components/MyProfile/EditProfileForm";
 import ProfileOverview from "../../components/MyProfile/ProfileOverview";
 import EditOverviewForm from "../../components/MyProfile/EditOverviewForm";
 import "../../components/MyProfile/myProfile.css";
-import ProfileServices from "../../components/ProfileServices";
+import ProfileServices from "../../components/Profile/ProfileServices";
 
 function MyProfilePage() {
   const [profile, setProfile] = useState(null);

@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { useParams } from "react-router";
-import { getProfile } from "../../services/profile.Service";
-import ProfileServices from "../../components/ProfileServices";
+import { useState, useEffect } from "react"
+import { useParams } from "react-router"
+import { getProfile } from "../../services/profile.Service"
+import ProfileServices from "../../components/Profile/ProfileServices"
+import ProfileReviews from "../../components/Profile/ProfileReviews"
 
 
 function ProfilePage() {
@@ -18,7 +19,7 @@ function ProfilePage() {
                 const profile = await getProfile(id)
                 setProfile(profile)
             } catch (err) {
-                console.error("Error fetching current Profile:", err);
+                console.error("Error fetching current Profile:", err)
                 setError(err)
             } finally{
                 setLoading(false)
@@ -82,17 +83,17 @@ function ProfilePage() {
                     </div>
                 </div>    
             </div>
-            
-            <div>
-                {profile.isSeller && (
-                    <ProfileServices id={id} />
-                )}
-            </div>
 
+                {profile.isSeller && (
+                    <>
+                        <ProfileServices id={id} />
+                        <ProfileReviews userId={id} />
+                    </>
+                )}
         </div>
     </>
   )
 
 }
 
-export default ProfilePage;
+export default ProfilePage

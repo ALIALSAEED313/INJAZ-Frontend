@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import { getServicesByFreelancer } from "../services/profile.Service";
+import { getServicesByFreelancer } from "../../services/profile.Service";
 
 
 function ProfileServices({ id }) {
