@@ -83,7 +83,17 @@ function ServicesPage() {
                   <img src={service.images[0]} alt={service.title} />
                 )}
 
-                <p>{service.category}</p>
+                <span>
+                  <p>
+                    {service.category} By:{" "}
+                    <Link
+                      to={`/profile/${service.freelencer?._id}`}
+                      style={{ textDecoration: 'underline', color: 'blue', fontWeight: 'bold' }}
+                    >
+                      {service.freelencer?.username || "Unknown Freelancer"}
+                    </Link>
+                  </p>
+                </span>
 
                 <h2>{service.title}</h2>
 

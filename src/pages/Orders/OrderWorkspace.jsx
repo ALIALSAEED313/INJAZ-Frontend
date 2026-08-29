@@ -64,6 +64,23 @@ function OrderWorkspace() {
         }
     }, [orderId])
 
+    async function handleAcceptOrder() {
+        try {
+            const token = localStorage.getItem('token')
+            await axios.put(`http://localhost:3000/orders/${orderId}/status`,
+                { status: 'Pending' },
+                { headers: { Authorization: `Bearer ${token}` } }
+            )
+
+            setOrder({ ...order, status: 'Pending' })
+            alert('Order accepted! Status updated to Pending.')
+        }
+        catch (err) {
+            console.error(err)
+            alert('Failed to accept order. Are you authorized?')
+        }
+    }
+
     async function handleStatusChange(event) {
         const newStatus = event.target.value
 
@@ -118,15 +135,36 @@ function OrderWorkspace() {
         {/* Top Section: Order Info & Status Updater */}
         <div className='order-details-header'>
             <h2>Order Workspace: {order?.service?.title}</h2>
-            <div className='status-updater'>
+            <div className='status-updater' style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <label>Order Status: </label>
                 {isSellerUser ? (
-                    <select value={order?.status} onChange={handleStatusChange} className='status-select'>
-                        <option value="Pending">Pending</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Delivered">Delivered</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
+                    <>
+                        {order?.status === 'Requested' && (
+                            <button
+                                type="button"
+                                onClick={handleAcceptOrder}
+                                style={{
+                                    padding: '6px 12px',
+                                    backgroundColor: '#52c41a',
+                                    color: '#fff',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    fontSize: '13px'
+                                }}
+                            >
+                                ✓ Accept Order
+                            </button>
+                        )}
+                        <select value={order?.status} onChange={handleStatusChange} className='status-select'>
+                            <option value="Requested">Requested (Awaiting Acceptance)</option>
+                            <option value="Pending">Pending (Accepted)</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </>
                 ) : (
                     <span className='status-badge'>{order?.status}</span>
                 )}

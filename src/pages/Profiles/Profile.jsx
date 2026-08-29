@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import { getProfile } from "../../services/profile.Service";
 import ProfileServices from "../../components/ProfileServices";
 
 
 function ProfilePage() {
     const [profile, setProfile] = useState(null)
-    const [services, setServices] = useState(null)
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)

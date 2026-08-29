@@ -47,7 +47,7 @@ function UserDashboard() {
 
     const myUserId = user?._id || localStorage.getItem('userId')
     const pendingOrdersForSeller = orders.filter(o => 
-        o.status === 'Pending' && 
+        (o.status === 'Requested' || o.status === 'Pending') && 
         ((o.seller?._id && o.seller._id.toString() === myUserId?.toString()) || (o.seller && o.seller.toString() === myUserId?.toString()))
     )
 
@@ -74,7 +74,7 @@ function UserDashboard() {
                 }}>
                     <span style={{ fontSize: '1.4rem' }}>🔔</span>
                     <span>
-                        You have <strong>{pendingOrdersForSeller.length} new order(s)</strong> waiting for your action in the workspace!
+                        You have <strong>{pendingOrdersForSeller.length} new order request(s)</strong> waiting for your action in the workspace!
                     </span>
                 </div>
             )}
@@ -99,7 +99,7 @@ function UserDashboard() {
                         </thead>
                         <tbody>
                             {orders.map((order) => {
-                                const isPendingSellerOrder = order.status === 'Pending' && 
+                                const isPendingSellerOrder = (order.status === 'Requested' || order.status === 'Pending') && 
                                     ((order.seller?._id && order.seller._id.toString() === myUserId?.toString()) || (order.seller && order.seller.toString() === myUserId?.toString()))
 
                                 return (
