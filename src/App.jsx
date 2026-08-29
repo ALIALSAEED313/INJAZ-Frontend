@@ -15,6 +15,7 @@ import OrderWorkspace from "./pages/Orders/OrderWorkspace";
 import Checkout from "./pages/Orders/Checkout";
 import ProfilePage from "./pages/Profiles/Profile";
 import ServicesPage from "./pages/ServicesPage";
+import MyProfilePage from "./pages/Profiles/MyProfilePage";
 import SellerRoute from "./components/SellerRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 
@@ -49,6 +50,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Checkout />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-profile"
+          element={
+            <ProtectedRoute>
+              <MyProfilePage />
             </ProtectedRoute>
           }
         />
