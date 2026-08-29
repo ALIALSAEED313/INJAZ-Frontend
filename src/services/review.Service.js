@@ -26,9 +26,15 @@ async function getReviewsForFreelancer(userId) {
     return response.data
 }
 
+async function getReviewByOrder(orderId) {
+    const response = await api.get(`/reviews/order/${orderId}`)
+    return response.data
+}
+
 export {
     getReviewByService,
     getReviewsForFreelancer,
+    getReviewByOrder,
     createReview,
     updateReview,
     deleteReview
