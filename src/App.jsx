@@ -20,6 +20,8 @@ import MyProfilePage from "./pages/Profiles/MyProfilePage";
 import ChatPage from "./pages/ChatPage";
 import SellerRoute from "./components/SellerRoute";
 import NotFoundPage from "./pages/NotFoundPage";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
   return (
@@ -109,10 +111,24 @@ function App() {
           }
         />
         <Route path="/profile/:id" element={<ProfilePage />} />
+<<<<<<< HEAD
         <Route path="/freelancer/:id" element={<ProfilePage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/404" element={<NotFoundPage />} />
         <Route path="*" element={<NotFoundPage />} />
+=======
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/404" element={<NotFoundPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />
+>>>>>>> c4e9a046d81f5dda58ff56254d037575d82be933
       </Routes>
       <Footer />
     </div>

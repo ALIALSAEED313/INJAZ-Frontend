@@ -158,6 +158,7 @@ function Navbar() {
   }
 
   return (
+<<<<<<< HEAD
     <>
       <nav className="site-navbar">
         <Link to="/" className="navbar-brand">
@@ -169,6 +170,21 @@ function Navbar() {
             />
           </div>
         </Link>
+=======
+    <nav className="navbar" style={{ 
+        position: "relative", 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        padding: "10px 20px" // Adds some breathing room around the edges
+      }}>
+      <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }} >
+      <div className="Injaz-brand">
+        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" style={{ height: "70px", width: "auto" }}/>
+      </div>
+      
+      </Link>
+>>>>>>> c4e9a046d81f5dda58ff56254d037575d82be933
 
         <div className="navbar-links">
           <Link to="/">{t("home")}</Link>
@@ -189,6 +205,7 @@ function Navbar() {
               <span>{theme === "dark" ? "☀️" : "🌙"}</span>
             </button>
 
+<<<<<<< HEAD
             <button
               type="button"
               className="language-toggle"
@@ -203,6 +220,47 @@ function Navbar() {
               {language === "en" ? "AR" : "EN"}
             </button>
           </div>
+=======
+            {user?.role === "admin" && (<Link to="/admin">Admin</Link>)}
+
+            {/* Notification Bell Dropdown */}
+            <div ref={dropdownRef} style={{ position: "relative" }}>
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: "1.3rem",
+                  position: "relative",
+                  padding: "6px",
+                  display: "flex",
+                  alignItems: "center"
+                }}
+                aria-label="Notifications"
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      right: "0",
+                      backgroundColor: "#ff4d4f",
+                      color: "#fff",
+                      borderRadius: "50%",
+                      padding: "2px 6px",
+                      fontSize: "11px",
+                      fontWeight: "bold",
+                      lineHeight: "1"
+                    }}
+                  >
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+>>>>>>> c4e9a046d81f5dda58ff56254d037575d82be933
 
           {user ? (
             <>
@@ -368,6 +426,7 @@ function Navbar() {
                 )}
               </div>
 
+<<<<<<< HEAD
               <Link to="/my-profile" className="profile-avatar-link">
                 <img
                   src={user?.avatarUrl}
@@ -387,6 +446,19 @@ function Navbar() {
                 onClick={() => {
                   setAuthMode("sign-up");
                   setAuthOpen(true);
+=======
+            <Link to={`/my-profile`} className="profile-avatar-link">
+              <img
+                src={user?.avatarUrl}
+                alt="Profile"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  border: '2px solid #ccc'
+>>>>>>> c4e9a046d81f5dda58ff56254d037575d82be933
                 }}
               >
                 {t("signUp")}
