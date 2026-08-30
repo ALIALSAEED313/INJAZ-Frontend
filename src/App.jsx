@@ -18,6 +18,8 @@ import ServicesPage from "./pages/ServicesPage";
 import MyProfilePage from "./pages/Profiles/MyProfilePage";
 import SellerRoute from "./components/SellerRoute";
 import NotFoundPage from "./pages/NotFoundPage";
+import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
 
 function App() {
   return (
@@ -64,12 +66,36 @@ function App() {
         <Route path="/services/:id" element={<ServiceDetailsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/terms" element={<TermsPage />} />
-        <Route path="/services/create" element={<SellerRoute> <CreateServicePage /> </SellerRoute>} />
-        <Route path="/services/:id/edit" element={<SellerRoute> <EditService /> </SellerRoute>} />
-        <Route path="/profile/:id" element={<ProfilePage/>} />
+        <Route
+          path="/services/create"
+          element={
+            <SellerRoute>
+              {" "}
+              <CreateServicePage />{" "}
+            </SellerRoute>
+          }
+        />
+        <Route
+          path="/services/:id/edit"
+          element={
+            <SellerRoute>
+              {" "}
+              <EditService />{" "}
+            </SellerRoute>
+          }
+        />
+        <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/404" element={<NotFoundPage />} />
-        <Route path="*" element={<NotFoundPage/>}/>
+        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="/admin"
+          element={
+            <AdminProtectedRoute>
+              <AdminDashboard />
+            </AdminProtectedRoute>
+          }
+        />
       </Routes>
       <Footer />
     </div>
