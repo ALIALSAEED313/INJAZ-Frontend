@@ -110,6 +110,8 @@ function Navbar() {
             <Link to="/dashboard">Dashboard</Link>
             {user.isSeller && <Link to="/services/create">Create Service</Link>}
 
+            {user?.role === "admin" && (<Link to="/admin">Admin</Link>)}
+
             {/* Notification Bell Dropdown */}
             <div ref={dropdownRef} style={{ position: "relative" }}>
               <button
