@@ -87,10 +87,10 @@ function ServicesPage() {
                   <p>
                     {service.category} By:{" "}
                     <Link
-                      to={`/profile/${service.freelencer?._id}`}
+                      to={`/profile/${service.freelancer?._id}`}
                       style={{ textDecoration: 'underline', color: 'blue', fontWeight: 'bold' }}
                     >
-                      {service.freelencer?.username || "Unknown Freelancer"}
+                      {service.freelancer?.username || "Unknown Freelancer"}
                     </Link>
                   </p>
                 </span>

@@ -87,8 +87,19 @@ function Navbar() {
   }
 
   return (
-    <nav className="navbar" style={{ position: "relative" }}>
-      <Link to="/" className="navbar-brand">INJAZ</Link>
+    <nav className="navbar" style={{ 
+        position: "relative", 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        padding: "10px 20px" // Adds some breathing room around the edges
+      }}>
+      <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }} >
+      <div className="Injaz-brand">
+        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" className="injaz-logo" style={{ height: "70px", width: "auto" }}/>
+      </div>
+      
+      </Link>
 
       <div className="navbar-links" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <Link to="/">Home</Link>
@@ -286,7 +297,7 @@ function Navbar() {
 
             <Link to={`/profile/${user._id}`} className="profile-avatar-link">
               <img
-                src={user?.avatarUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWC-v0HrKYp0-av4D0eTZv5hoIHoW35GhmKG2djTVP4Q&s'}
+                src={user?.avatarUrl}
                 alt="Profile"
                 style={{
                   width: '40px',
