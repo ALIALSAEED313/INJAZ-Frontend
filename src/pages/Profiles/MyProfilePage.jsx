@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getMyProfile } from "../../services/profile.Service";
+import { getReviewsForFreelancer } from "../../services/review.Service";
 import ProfileHeader from "../../components/MyProfile/ProfileHeader";
 import EditProfileForm from "../../components/MyProfile/EditProfileForm";
 import ProfileOverview from "../../components/MyProfile/ProfileOverview";
@@ -9,6 +10,7 @@ import ProfileServices from "../../components/Profile/ProfileServices";
 
 function MyProfilePage() {
   const [profile, setProfile] = useState(null);
+  const [sellerReviews, setSellerReviews] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingOverview, setIsEditingOverview] = useState(false);
 
@@ -18,8 +20,15 @@ function MyProfilePage() {
   useEffect(() => {
     async function fetchMyProfile() {
       try {
-        const profile = await getMyProfile();
-        setProfile(profile);
+        const profileData = await getMyProfile();
+        setProfile(profileData);
+
+        if (profileData?.isSeller && profileData?._id) {
+          const reviews = await getReviewsForFreelancer(profileData._id);
+          setSellerReviews(Array.isArray(reviews) ? reviews : []);
+        } else {
+          setSellerReviews([]);
+        }
       } catch (err) {
         console.error("Error fetching my profile:", err);
         setError(err);
@@ -44,38 +53,83 @@ function MyProfilePage() {
   }
 
   return (
-    <>
-      <ProfileHeader profile={profile} onEdit={() => setIsEditing(true)} />
-
-      {isEditing && (
-        <EditProfileForm
+    <main className="my-profile-page">
+      <div className="my-profile-shell">
+        <ProfileHeader
           profile={profile}
-          onClose={() => setIsEditing(false)}
-          onUpdated={(updatedProfile) => {
-            setProfile(updatedProfile);
-            setIsEditing(false);
-          }}
+          reviews={sellerReviews}
+          onEdit={() => setIsEditing(true)}
         />
-      )}
 
-      <ProfileOverview
-        profile={profile}
-        onEdit={() => setIsEditingOverview(true)}
-      />
+        {isEditing && (
+          <EditProfileForm
+            profile={profile}
+            onClose={() => setIsEditing(false)}
+            onUpdated={(updatedProfile) => {
+              setProfile(updatedProfile);
+              setIsEditing(false);
+            }}
+          />
+        )}
 
-      {isEditingOverview && (
-        <EditOverviewForm
-          profile={profile}
-          onClose={() => setIsEditingOverview(false)}
-          onUpdated={(updatedProfile) => {
-            setProfile(updatedProfile);
-            setIsEditingOverview(false);
-          }}
-        />
-      )}
+        <div className="my-profile-content-grid">
+          <div className="my-profile-main-column">
+            <ProfileOverview
+              profile={profile}
+              onEdit={() => setIsEditingOverview(true)}
+            />
 
-      {profile.isSeller && <ProfileServices id={profile._id} />}
-    </>
+            {isEditingOverview && (
+              <EditOverviewForm
+                profile={profile}
+                onClose={() => setIsEditingOverview(false)}
+                onUpdated={(updatedProfile) => {
+                  setProfile(updatedProfile);
+                  setIsEditingOverview(false);
+                }}
+              />
+            )}
+          </div>
+
+          <aside className="my-profile-side-column">
+            <div className="my-profile-card">
+              <p className="my-profile-side-label">At a glance</p>
+              <ul className="my-profile-summary-list">
+                <li>
+                  <span>Account type</span>
+                  <strong>{profile.isSeller ? "Seller" : "Client"}</strong>
+                </li>
+                <li>
+                  <span>Location</span>
+                  <strong>{profile.country || "Not added"}</strong>
+                </li>
+                <li>
+                  <span>Member since</span>
+                  <strong>
+                    {new Date(profile.createdAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </strong>
+                </li>
+              </ul>
+            </div>
+          </aside>
+        </div>
+
+        {profile.isSeller && (
+          <section className="my-profile-card services-block">
+            <div className="my-profile-section-header">
+              <div>
+                <p className="my-profile-section-kicker">Services</p>
+                <h2>My services</h2>
+              </div>
+            </div>
+            <ProfileServices id={profile._id} />
+          </section>
+        )}
+      </div>
+    </main>
   );
 }
 

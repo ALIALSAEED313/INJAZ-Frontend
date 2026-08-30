@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { getNames } from "country-list";
+import { useMemo, useState } from "react";
 import { updateProfile } from "../../services/profile.Service";
 import ISO6391 from "iso-639-1";
+import { getNames } from "country-list";
 
 function EditOverviewForm({ profile, onClose, onUpdated }) {
   const [formData, setFormData] = useState({
@@ -12,10 +12,32 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
     isSeller: profile.isSeller || false,
   });
 
-  const countries = getNames();
-  const languagesList = ISO6391.getAllNames();
-
   const [skillInput, setSkillInput] = useState("");
+  const [languageInput, setLanguageInput] = useState("");
+
+  const countryOptions = useMemo(() => getNames(), []);
+  const filteredCountryOptions = useMemo(() => {
+    const query = formData.country.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return countryOptions.filter((country) =>
+      country.toLowerCase().includes(query),
+    );
+  }, [countryOptions, formData.country]);
+
+  const languageOptions = useMemo(() => ISO6391.getAllNames(), []);
+  const filteredLanguageOptions = useMemo(() => {
+    const query = languageInput.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return languageOptions.filter(
+      (language) =>
+        language.toLowerCase().includes(query) &&
+        !formData.languages.includes(language),
+    );
+  }, [formData.languages, languageInput, languageOptions]);
 
   function handleChange(event) {
     setFormData({
@@ -35,19 +57,19 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
     }
   }
 
-  function handleAddLanguage(event) {
-    const selectedLanguage = event.target.value;
+  function handleAddLanguage() {
+    const nextLanguage = languageInput.trim();
 
-    if (!selectedLanguage) return;
+    if (!nextLanguage) return;
 
-    if (!formData.languages.includes(selectedLanguage)) {
+    if (!formData.languages.includes(nextLanguage)) {
       setFormData({
         ...formData,
-        languages: [...formData.languages, selectedLanguage],
+        languages: [...formData.languages, nextLanguage],
       });
     }
 
-    event.target.value = "";
+    setLanguageInput("");
   }
 
   function handleRemoveLanguage(languageToRemove) {
@@ -84,7 +106,7 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
   return (
     <>
       <div className="edit-overlay" onClick={onClose}></div>
-      
+
       <div className="edit-profile-panel">
         <form onSubmit={handleSubmit}>
           <div className="edit-panel-header">
@@ -96,31 +118,51 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
           </div>
 
           <div className="edit-panel-content">
-            <label htmlFor="bio">Description:</label>
+            <div className="edit-page-helper-box">
+              <strong>Complete your details</strong>
+              <p>
+                Add a clear description, your location, and the skills you want
+                clients to see. This helps buyers understand your expertise.
+              </p>
+            </div>
+
+            <label htmlFor="bio">Description *</label>
 
             <textarea
               name="bio"
               id="bio"
               value={formData.bio}
               onChange={handleChange}
+              required
             />
 
             <label htmlFor="country">Country</label>
 
-            <select
-              name="country"
-              id="country"
-              value={formData.country}
-              onChange={handleChange}
-            >
-              <option value="">Select your country</option>
+            <div className="suggestion-input-wrap">
+              <input
+                type="text"
+                name="country"
+                id="country"
+                value={formData.country}
+                onChange={handleChange}
+                placeholder="Type your country"
+              />
 
-              {countries.map((country) => (
-                <option key={country} value={country}>
-                  {country}
-                </option>
-              ))}
-            </select>
+              {filteredCountryOptions.length > 0 && (
+                <ul className="suggestion-list">
+                  {filteredCountryOptions.slice(0, 6).map((country) => (
+                    <li key={country}>
+                      <button
+                        type="button"
+                        onClick={() => setFormData({ ...formData, country })}
+                      >
+                        {country}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
             <label>Languages</label>
 
@@ -140,17 +182,40 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
               ))}
             </div>
 
-            <select defaultValue="" onChange={handleAddLanguage}>
-              <option value="">Select language</option>
+            <div className="suggestion-input-wrap">
+              <input
+                type="text"
+                value={languageInput}
+                onChange={(event) => setLanguageInput(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    handleAddLanguage();
+                  }
+                }}
+                placeholder="Type a language and press Enter"
+              />
 
-              {languagesList.map((language) => (
-                <option key={language} value={language}>
-                  {language}
-                </option>
-              ))}
-            </select>
+              {filteredLanguageOptions.length > 0 && (
+                <ul className="suggestion-list">
+                  {filteredLanguageOptions.slice(0, 6).map((language) => (
+                    <li key={language}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLanguageInput(language);
+                          handleAddLanguage();
+                        }}
+                      >
+                        {language}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
-            <label>Skills</label>
+            <label>Skills *</label>
 
             <div className="tags-container">
               {formData.skills.map((skill) => (
@@ -180,10 +245,6 @@ function EditOverviewForm({ profile, onClose, onUpdated }) {
               }}
               placeholder="e.g. React"
             />
-
-            <button type="button" onClick={handleAddSkill}>
-              Add
-            </button>
 
             <div className="role-section">
               <h3>What do you plan to do?</h3>

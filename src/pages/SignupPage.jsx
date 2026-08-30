@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { signUp } from "../services/authService";
+import { useSettings } from "../context/SettingsContext";
 
 function Signup() {
+  const { t, language } = useSettings();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -48,84 +50,101 @@ function Signup() {
   }
 
   return (
-    <main>
-      <h1>Sign Up</h1>
-
-      <p className="error">{error}</p>
-      <div className="form-container">
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="username">Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            name="username"
-            onChange={handleChange}
-            required
-          />
+    <main className="auth-page">
+      <div className="auth-shell auth-shell-signup">
+        <div className="auth-visual-panel">
+          <span className="auth-kicker">{t("createAccount")}</span>
+          <h1>{t("joinFreelanceHiring")}</h1>
+          <p>
+            {language === "ar"
+              ? "ابدأ بشراء أو بيع الخدمات بتجربة سوق آمنة وسريعة."
+              : "Start buying or selling services with a secure, streamlined marketplace experience."}
+          </p>
+          <ul className="auth-feature-list">
+            <li>{t("buildProfile")}</li>
+            <li>{t("launchServices")}</li>
+            <li>{t("everythingDashboard")}</li>
+          </ul>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            value={email}
-            name="email"
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <div className="auth-form-panel">
+          <h2>{t("signUp")}</h2>
+          <p className="error">{error}</p>
 
-        <div className="form-group">
-          <label htmlFor="accountType">I am joining as a:</label>
-          <select
-            id="accountType"
-            name="accountType"
-            value={accountType}
-            onChange={handleChange}
-            required
-          >
-            <option value="buyer">Buyer (Looking to hire)</option>
-            <option value="seller">Freelancer / Seller (Offering services)</option>
-          </select>
-        </div>
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div>
+              <label htmlFor="username">{t("username")}</label>
+              <input
+                type="text"
+                id="username"
+                value={username}
+                name="username"
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            name="password"
-            onChange={handleChange}
-            required
-          />
-        </div>
+            <div>
+              <label htmlFor="email">{t("email")}</label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                name="email"
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <div className="form-group">
-          <label htmlFor="confirm">Confirm Password:</label>
-          <input
-            type="password"
-            id="confirm"
-            value={passwordConf}
-            name="passwordConf"
-            onChange={handleChange}
-            required
-          />
-        </div>
+            <div>
+              <label htmlFor="accountType">{t("iAmJoiningAs")}</label>
+              <select
+                id="accountType"
+                name="accountType"
+                value={accountType}
+                onChange={handleChange}
+                required
+              >
+                <option value="buyer">{t("buyer")}</option>
+                <option value="seller">{t("seller")}</option>
+              </select>
+            </div>
 
-        <div className="form-group">
-          <button className="btn btn-primary" disabled={isFormInvalid() || submitting}>
-            {submitting ? "Signing up..." : "Sign Up"}
-          </button>
+            <div>
+              <label htmlFor="password">{t("password")}</label>
+              <input
+                type="password"
+                id="password"
+                value={password}
+                name="password"
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <button className="btn btn-primary" type="button" onClick={() => navigate("/")}>
-            Cancel
-          </button>
+            <div>
+              <label htmlFor="confirm">{t("confirmPassword")}</label>
+              <input
+                type="password"
+                id="confirm"
+                value={passwordConf}
+                name="passwordConf"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="auth-actions">
+              <button type="submit" disabled={isFormInvalid() || submitting}>
+                {submitting ? t("signingUp") : t("signUp")}
+              </button>
+
+              <button type="button" onClick={() => navigate("/")}>
+                {t("cancel")}
+              </button>
+            </div>
+          </form>
         </div>
-      </form>
       </div>
     </main>
   );
