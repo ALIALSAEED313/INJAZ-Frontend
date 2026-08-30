@@ -96,7 +96,7 @@ function Navbar() {
       }}>
       <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }} >
       <div className="Injaz-brand">
-        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" className="injaz-logo" style={{ height: "70px", width: "auto" }}/>
+        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" style={{ height: "70px", width: "auto" }}/>
       </div>
       
       </Link>
@@ -295,7 +295,7 @@ function Navbar() {
               )}
             </div>
 
-            <Link to={`/profile/${user._id}`} className="profile-avatar-link">
+            <Link to={`/my-profile`} className="profile-avatar-link">
               <img
                 src={user?.avatarUrl}
                 alt="Profile"
