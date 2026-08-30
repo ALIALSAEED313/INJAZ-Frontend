@@ -52,9 +52,9 @@ function Signup() {
       <h1>Sign Up</h1>
 
       <p className="error">{error}</p>
-
+      <div className="form-container">
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label htmlFor="username">Username:</label>
           <input
             type="text"
@@ -66,7 +66,7 @@ function Signup() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
             type="email"
@@ -78,7 +78,7 @@ function Signup() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="accountType">I am joining as a:</label>
           <select
             id="accountType"
@@ -92,7 +92,7 @@ function Signup() {
           </select>
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="password">Password:</label>
           <input
             type="password"
@@ -104,7 +104,7 @@ function Signup() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="confirm">Confirm Password:</label>
           <input
             type="password"
@@ -116,16 +116,17 @@ function Signup() {
           />
         </div>
 
-        <div>
-          <button disabled={isFormInvalid() || submitting}>
+        <div className="form-group">
+          <button className="btn btn-primary" disabled={isFormInvalid() || submitting}>
             {submitting ? "Signing up..." : "Sign Up"}
           </button>
 
-          <button type="button" onClick={() => navigate("/")}>
+          <button className="btn btn-primary" type="button" onClick={() => navigate("/")}>
             Cancel
           </button>
         </div>
       </form>
+      </div>
     </main>
   );
 }

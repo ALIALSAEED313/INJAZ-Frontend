@@ -87,7 +87,7 @@ function UserDashboard() {
                 </div>
             ) : (
                 <div className='table-container'>
-                    <table className='orders-table'>
+                    <table className="dashboard-table">
                         <thead>
                             <tr>
                                 <th>Order Id</th>

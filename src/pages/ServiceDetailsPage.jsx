@@ -267,12 +267,12 @@ function ServiceDetailsPage() {
             <div>
               <Link to={`/services/${id}/edit`}>Edit Service</Link>
 
-              <button type="button" onClick={handleDelete} disabled={deleting}>
+              <button className="btn btn-primary" type="button" onClick={handleDelete} disabled={deleting}>
                 {deleting ? "Deleting..." : "Delete Service"}
               </button>
             </div>
           ) : currentUser ? (
-            <button type="button" onClick={handleOrder} disabled={ordering}>
+            <button className="btn btn-primary" type="button" onClick={handleOrder} disabled={ordering}>
               {ordering ? "Creating Order..." : "Order Service"}
             </button>
           ) : (

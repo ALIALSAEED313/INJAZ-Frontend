@@ -54,7 +54,7 @@ function Homepage() {
               onChange={(event) => setSearch(event.target.value)}
             />
 
-            <button onClick={handleSearch}>Search</button>
+            <button className="btn btn-primary" onClick={handleSearch}>Search</button>
           </div>
 
           {error && <p>{error}</p>}

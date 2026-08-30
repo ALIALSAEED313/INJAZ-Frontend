@@ -54,9 +54,9 @@ function CreateServicePage() {
       <h1>Create a Service</h1>
 
       {error && <p>{error}</p>}
-
+    <div className="form-container">
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="form-group">
           <label htmlFor="title">Service Title</label>
 
           <input
@@ -70,7 +70,7 @@ function CreateServicePage() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="description">Description</label>
 
           <textarea
@@ -83,7 +83,7 @@ function CreateServicePage() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="category">Category</label>
 
           <select
@@ -117,7 +117,7 @@ function CreateServicePage() {
           </select>
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="price">Price (BHD)</label>
 
           <input
@@ -132,7 +132,7 @@ function CreateServicePage() {
           />
         </div>
 
-        <div>
+        <div className="form-group">
           <label htmlFor="deliveryTime">Delivery Time (days)</label>
 
           <input
@@ -147,14 +147,15 @@ function CreateServicePage() {
           />
         </div>
 
-        <button type="submit" disabled={submitting}>
+        <button className="btn btn-primary" type="submit" disabled={submitting}>
           {submitting ? "Creating..." : "Create Service"}
         </button>
 
-        <button type="button" onClick={() => navigate("/dashboard")}>
+        <button className="btn btn-primary" type="button" onClick={() => navigate("/dashboard")}>
           Cancel
         </button>
       </form>
+      </div>
     </main>
   );
 }

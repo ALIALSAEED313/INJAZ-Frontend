@@ -237,6 +237,7 @@ function OrderWorkspace() {
               {order?.status === "Requested" && (
                 <button
                   type="button"
+                  className="btn btn-primary"
                   onClick={handleAcceptOrder}
                   style={{
                     padding: "6px 12px",
@@ -290,11 +291,11 @@ function OrderWorkspace() {
 
                       <p>{existingReview.comment}</p>
 
-                      <button type="button" onClick={handleStartEditReview}>
+                      <button className="btn btn-primary" type="button" onClick={handleStartEditReview}>
                         Edit Review
                       </button>
 
-                      <button type="button" onClick={handleDeleteReview}>
+                      <button className="btn btn-primary" type="button" onClick={handleDeleteReview}>
                         Delete Review
                       </button>
                     </div>
@@ -334,10 +335,11 @@ function OrderWorkspace() {
                         }
                       />
 
-                      <button type="submit">Save Changes</button>
+                      <button className="btn btn-primary" type="submit">Save Changes</button>
 
                       <button
                         type="button"
+                        className="btn btn-primary"
                         onClick={() => setShowReviewForm(false)}
                       >
                         Cancel
@@ -350,6 +352,7 @@ function OrderWorkspace() {
                   {!showReviewForm ? (
                     <button
                       type="button"
+                      className="btn btn-primary"
                       onClick={() => setShowReviewForm(true)}
                     >
                       Leave a Review
@@ -391,10 +394,11 @@ function OrderWorkspace() {
                         placeholder="Share your experience..."
                       />
 
-                      <button type="submit">Submit Review</button>
+                      <button className="btn btn-primary" type="submit">Submit Review</button>
 
                       <button
                         type="button"
+                        className="btn btn-primary"
                         onClick={() => setShowReviewForm(false)}
                       >
                         Cancel
@@ -431,7 +435,7 @@ function OrderWorkspace() {
             value={newMessage}
             onChange={(event) => setNewMessage(event.target.value)}
           ></input>
-          <button type="submit" className="send-btn">
+          <button className="btn btn-primary" type="submit" className="send-btn">
             Send
           </button>
         </form>

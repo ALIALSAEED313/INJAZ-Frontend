@@ -96,7 +96,7 @@ function Navbar() {
       }}>
       <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }} >
       <div className="Injaz-brand">
-        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" className="injaz-logo" style={{ height: "70px", width: "auto" }}/>
+        <img src="src/assets/image.svg" className="injaz-logo" alt="Injaz Logo" className="injaz-logo" style={{ height: "70px", width: "auto" }}/>
       </div>
       
       </Link>

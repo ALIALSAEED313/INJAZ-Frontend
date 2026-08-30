@@ -44,25 +44,16 @@ function ServicesPage() {
 
   return (
     <main>
-      <section style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <section style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px", paddingBottom: "10px", borderBottom: "1px solid #e1e8ed" }}>
         <div>
-          <h1>All Services</h1>
-
-          <p>Find the right freelancer for your project.</p>
+          <h1 style={{ margin: "0 0 10px 0" }}>All Services</h1>
+          <p style={{ margin: 0, color: "#777777" }}>Find the right freelancer for your project.</p>
         </div>
 
         {user?.isSeller && (
           <Link
             to="/services/create"
             className="btn-create-service"
-            style={{
-              padding: "10px 18px",
-              backgroundColor: "#0070f3",
-              color: "#fff",
-              borderRadius: "6px",
-              textDecoration: "none",
-              fontWeight: "600",
-            }}
           >
             + Create Service
           </Link>
@@ -76,36 +67,40 @@ function ServicesPage() {
         </section>
       ) : (
         <section>
-          <div>
+          {/* تمت إضافة كلاس الشبكة هنا */}
+          <div className="services-grid">
             {services.map((service) => (
-              <article key={service._id}>
+              <article key={service._id} className="service-card">
                 {service.images && service.images.length > 0 && (
                   <img src={service.images[0]} alt={service.title} />
                 )}
 
-                <span>
-                  <p>
-                    {service.category} By:{" "}
-                    <Link
-                      to={`/profile/${service.freelancer?._id}`}
-                      style={{ textDecoration: 'underline', color: 'blue', fontWeight: 'bold' }}
-                    >
+                {/* قسم تفاصيل البائع والعنوان */}
+                <div className="card-content">
+                  <div className="card-meta">
+                    {service.category} | By:{" "}
+                    <Link to={`/profile/${service.freelancer?._id}`}>
                       {service.freelancer?.username || "Unknown Freelancer"}
                     </Link>
+                  </div>
+                  
+                  <h2>{service.title}</h2>
+                  
+                  <p className="service-desc">{service.description}</p>
+                </div>
+
+                {/* قسم السعر ومدة التسليم */}
+                <div className="card-footer">
+                  <p>
+                    Starting at <strong>{service.price} BHD</strong>
                   </p>
-                </span>
+                  <p>Delivery: {service.deliveryTime} days</p>
+                </div>
 
-                <h2>{service.title}</h2>
-
-                <p>{service.description}</p>
-
-                <p>
-                  Starting at <strong>{service.price} BHD</strong>
-                </p>
-
-                <p>Delivery: {service.deliveryTime} days</p>
-
-                <Link to={`/services/${service._id}`}>View Service</Link>
+                {/* زر العرض */}
+                <Link to={`/services/${service._id}`} className="view-service-btn">
+                  View Service
+                </Link>
               </article>
             ))}
           </div>

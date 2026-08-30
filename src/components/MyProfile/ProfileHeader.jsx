@@ -2,7 +2,7 @@
 function ProfileHeader({ profile, onEdit }) {
   return (
     <>
-        <div>
+        <div className="profile-header-card" >
             <div>
                 <div>
                     <div>
