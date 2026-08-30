@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { searchServices } from "../services/serviceService";
 import api from "../services/api";
+import { useSettings } from "../context/SettingsContext";
+
 function Homepage() {
+  const { t, language } = useSettings();
   const [search, setSearch] = useState("");
   const [services, setServices] = useState([]);
   const [error, setError] = useState("");
@@ -139,30 +142,41 @@ function Homepage() {
     <main>
       <section className="hero">
         <div className="hero-content">
-          <span className="hero-badge">🇧🇭 Bahrain's Freelance Marketplace</span>
+          <span className="hero-badge">
+            🇧🇭{" "}
+            {language === "ar"
+              ? "سوق البحرين للمستقلين"
+              : "Bahrain's Freelance Marketplace"}
+          </span>
           <h1>
-            Find the perfect
-            <span> freelancer for your project.</span>
+            {language === "ar" ? "اعثر على" : "Find the perfect"}
+            <span>
+              {language === "ar"
+                ? " مستقل مناسب لمشروعك."
+                : " freelancer for your project."}
+            </span>
           </h1>
           <p>
-            From websites and graphic design to marketing and writing, find
-            skilled freelancers ready to help.
+            {language === "ar"
+              ? "من المواقع والتصميم إلى التسويق والكتابة، اعثر على مستقلين مهرة جاهزين لمساعدتك."
+              : "From websites and graphic design to marketing and writing, find skilled freelancers ready to help."}
           </p>
           <form className="search-box" onSubmit={handleSearch}>
             <input
               type="text"
-              placeholder="What service are you looking for?"
+              placeholder={t("searchPlaceholder")}
               value={search}
               onChange={(event) => setSearch(event.target.value)}
+              dir={language === "ar" ? "rtl" : "ltr"}
             />
             <button type="submit" disabled={loading}>
-              {loading ? "Searching..." : "🔎 Search"}
+              {loading ? t("searching") : `🔎 ${t("search")}`}
             </button>
           </form>
           {error && <p className="error">{error}</p>}
           {popularSearches.length > 0 && (
             <div className="popular-searches">
-              <span>Popular:</span>
+              <span>{t("popular")}</span>
               {popularSearches.map((item) => (
                 <button
                   key={item.term}
@@ -180,21 +194,27 @@ function Homepage() {
         <section className="search-results">
           <div className="section-header">
             <div>
-              <span className="section-label">SEARCH RESULTS</span>
-              <h2>Services for "{search}"</h2>
+              <span className="section-label">
+                {language === "ar" ? "نتائج البحث" : "SEARCH RESULTS"}
+              </span>
+              <h2>
+                {language === "ar"
+                  ? `خدمات لـ "${search}"`
+                  : `Services for "${search}"`}
+              </h2>
             </div>
             <button type="button" onClick={clearSearch}>
-              Clear
+              {t("clear")}
             </button>
           </div>
           {loading ? (
-            <div className="loading">Searching for services...</div>
+            <div className="loading">{t("searching")}</div>
           ) : services.length === 0 ? (
             <div className="empty-state">
               <span>🔎</span>
-              <h3>No services found</h3>
-              <p>Try another search term or browse our categories.</p>
-              <Link to="/services">Browse All Services</Link>
+              <h3>{t("noServicesFound")}</h3>
+              <p>{t("tryAnotherSearch")}</p>
+              <Link to="/services">{t("browseServices")}</Link>
             </div>
           ) : (
             <div className="services-grid">
@@ -230,7 +250,7 @@ function Homepage() {
                       ⭐ {service.rating || "New"}
                     </div>
                     <div className="service-footer">
-                      <span>Starting at</span>
+                      <span>{t("startingAt")}</span>
                       <strong>{service.price} BHD</strong>
                     </div>
                   </div>
@@ -243,11 +263,17 @@ function Homepage() {
       <section className="categories">
         <div className="section-header">
           <div>
-            <span className="section-label">EXPLORE</span>
-            <h2>Explore Popular Categories</h2>
-            <p>Find the right freelancer for any type of project.</p>
+            <span className="section-label">
+              {language === "ar" ? "استكشف" : "EXPLORE"}
+            </span>
+            <h2>{t("popularCategories")}</h2>
+            <p>
+              {language === "ar"
+                ? "اعثر على المستقل المناسب لأي نوع من المشاريع."
+                : "Find the right freelancer for any type of project."}
+            </p>
           </div>
-          <Link to="/services">View All →</Link>
+          <Link to="/services">{t("viewAll")} →</Link>
         </div>
         <div className="categories-grid">
           {categories.map((category) => (

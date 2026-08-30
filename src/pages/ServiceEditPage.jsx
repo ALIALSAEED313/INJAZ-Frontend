@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import axios from "axios";
+
 function EditService() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -9,10 +10,14 @@ function EditService() {
     description: "",
     category: "",
     price: "",
+    deliveryTime: "",
   });
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [previewUrls, setPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
   useEffect(() => {
     const getService = async () => {
       try {
@@ -25,7 +30,9 @@ function EditService() {
           description: service.description || "",
           category: service.category || "",
           price: service.price || "",
+          deliveryTime: service.deliveryTime || "",
         });
+        setPreviewUrls(service.images || []);
       } catch (error) {
         console.error(error);
         setError("Failed to load service");
@@ -35,21 +42,41 @@ function EditService() {
     };
     getService();
   }, [id]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
+  const handleImageChange = (event) => {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+
+    const nextUrls = files.map((file) => URL.createObjectURL(file));
+    setSelectedImages((prev) => [...prev, ...files]);
+    setPreviewUrls((prev) => [...prev, ...nextUrls]);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
     setError("");
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`http://localhost:3000/services/${id}`, formData, {
+      const payload = new FormData();
+      payload.append("title", formData.title);
+      payload.append("description", formData.description);
+      payload.append("category", formData.category);
+      payload.append("price", formData.price);
+      payload.append("deliveryTime", formData.deliveryTime);
+      selectedImages.forEach((image) => payload.append("images", image));
+
+      await axios.put(`http://localhost:3000/services/${id}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       });
       navigate(`/services/${id}`);
@@ -60,6 +87,7 @@ function EditService() {
       setSaving(false);
     }
   };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -100,12 +128,14 @@ function EditService() {
               required
             >
               <option value="">Select category</option>
-              <option value="Web Development">Web Development</option>
-              <option value="Graphic Design">Graphic Design</option>
-              <option value="Video Editing">Video Editing</option>
-              <option value="Writing">Writing</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Photography">Photography</option>
+              <option value="web development">Web Development</option>
+              <option value="graphic design">Graphic Design</option>
+              <option value="video & animation">Video & Animation</option>
+              <option value="writing & translation">
+                Writing & Translation
+              </option>
+              <option value="digital marketing">Digital Marketing</option>
+              <option value="photography">Photography</option>
             </select>
           </div>
 
@@ -134,6 +164,45 @@ function EditService() {
               required
             />
           </div>
+          <div>
+            <label className="block font-medium mb-2">
+              Delivery Time (days)
+            </label>
+            <input
+              type="number"
+              name="deliveryTime"
+              value={formData.deliveryTime}
+              onChange={handleChange}
+              placeholder="Enter delivery time"
+              min="1"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-medium mb-2">Service Images</label>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageChange}
+              className="w-full border border-gray-300 rounded-lg px-4 py-3"
+            />
+            {previewUrls.length > 0 && (
+              <div className="grid grid-cols-3 gap-3 mt-4">
+                {previewUrls.map((preview, index) => (
+                  <img
+                    key={`${preview}-${index}`}
+                    src={preview}
+                    alt="service preview"
+                    className="w-full h-28 object-cover rounded-lg border border-gray-200"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="flex gap-4 pt-4">
             <button
               type="button"

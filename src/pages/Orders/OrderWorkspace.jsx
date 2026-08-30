@@ -7,9 +7,11 @@ import {
   deleteReview,
 } from "../../services/review.Service";
 import axios from "axios";
+import { useSettings } from "../../context/SettingsContext";
 
 function OrderWorkspace() {
   const { orderId } = useParams();
+  const { t, language } = useSettings();
   const [order, setOrder] = useState(null);
 
   const [conversation, setConversation] = useState(null);
@@ -217,226 +219,234 @@ function OrderWorkspace() {
     sellerId && myUserId && sellerId.toString() === myUserId.toString(),
   );
 
-
-
   if (loading)
     return <div className="workspace-loading">Loading Workspace ...</div>;
   if (error) return <div className="workspace-error">{error}</div>;
+
   return (
-    <div className="order-workspace">
-      {/* Top Section: Order Info & Status Updater */}
-      <div className="order-details-header">
-        <h2>Order Workspace: {order?.service?.title}</h2>
-        <div
-          className="status-updater"
-          style={{ display: "flex", alignItems: "center", gap: "10px" }}
-        >
-          <label>Order Status: </label>
-          {isSellerUser ? (
-            <>
-              {order?.status === "Requested" && (
-                <button
-                  type="button"
-                  onClick={handleAcceptOrder}
-                  style={{
-                    padding: "6px 12px",
-                    backgroundColor: "#52c41a",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                    fontWeight: "bold",
-                    fontSize: "13px",
-                  }}
-                >
-                  ✓ Accept Order
-                </button>
-              )}
-              <select
-                value={order?.status}
-                onChange={handleStatusChange}
-                className="status-select"
-              >
-                <option value="Requested">
-                  Requested (Awaiting Acceptance)
-                </option>
-                <option value="Pending">Pending (Accepted)</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Delivered">Delivered</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-            </>
-          ) : (
-            <span className="status-badge">{order?.status}</span>
-          )}
-        </div>
-      </div>
+    <main className="workspace-page">
+      <div className="workspace-shell">
+        <header className="workspace-header">
+          <div>
+            <span className="section-label">Workspace</span>
+            <h1>Order Workspace: {order?.service?.title}</h1>
+          </div>
 
+          <div className="workspace-header-actions">
+            <button
+              type="button"
+              className="secondary-btn"
+              onClick={() =>
+                window.location.assign(`/workspace/${orderId}/chat`)
+              }
+            >
+              Chat
+            </button>
 
-        <div>
-          {!isSellerUser && order?.status === "Delivered" && (
-            <div>
-              {hasReviewed && existingReview ? (
+            <div className="status-updater">
+              <label>{t("orderStatus")}:</label>
+              {isSellerUser ? (
                 <>
-                  {!showReviewForm ? (
-                    <div>
-                      <h3>Your Review</h3>
+                  {order?.status === "Requested" && (
+                    <button
+                      type="button"
+                      className="accept-order-btn"
+                      onClick={handleAcceptOrder}
+                    >
+                      ✓ Accept Order
+                    </button>
+                  )}
+                  <select
+                    value={order?.status}
+                    onChange={handleStatusChange}
+                    className="status-select"
+                  >
+                    <option value="Requested">
+                      Requested (Awaiting Acceptance)
+                    </option>
+                    <option value="Pending">Pending (Accepted)</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </>
+              ) : (
+                <span className="status-badge">{order?.status}</span>
+              )}
+            </div>
+          </div>
+        </header>
 
-                      <p>
-                        {"★".repeat(existingReview.rating)}
-                        {"☆".repeat(5 - existingReview.rating)}{" "}
-                        {existingReview.rating}
-                      </p>
-
-                      <p>{existingReview.comment}</p>
-
-                      <button type="button" onClick={handleStartEditReview}>
+        {!isSellerUser && order?.status === "Delivered" && (
+          <section className="workspace-panel review-panel">
+            {hasReviewed && existingReview ? (
+              <>
+                {!showReviewForm ? (
+                  <div>
+                    <h3>Your Review</h3>
+                    <p className="review-stars">
+                      {"★".repeat(existingReview.rating)}
+                      {"☆".repeat(5 - existingReview.rating)}{" "}
+                      {existingReview.rating}
+                    </p>
+                    <p>{existingReview.comment}</p>
+                    <div className="inline-actions">
+                      <button
+                        type="button"
+                        className="secondary-btn"
+                        onClick={handleStartEditReview}
+                      >
                         Edit Review
                       </button>
-
-                      <button type="button" onClick={handleDeleteReview}>
+                      <button
+                        type="button"
+                        className="ghost-btn"
+                        onClick={handleDeleteReview}
+                      >
                         Delete Review
                       </button>
                     </div>
-                  ) : (
-                    <form onSubmit={handleUpdateReview}>
-                      <h3>Edit Review</h3>
+                  </div>
+                ) : (
+                  <form onSubmit={handleUpdateReview} className="review-form">
+                    <h3>Edit Review</h3>
 
-                      <label htmlFor="rating">Rating</label>
-
-                      <select
-                        id="rating"
-                        value={reviewForm.rating}
-                        onChange={(event) =>
-                          setReviewForm({
-                            ...reviewForm,
-                            rating: Number(event.target.value),
-                          })
-                        }
-                      >
-                        <option value={5}>5 Stars</option>
-                        <option value={4}>4 Stars</option>
-                        <option value={3}>3 Stars</option>
-                        <option value={2}>2 Stars</option>
-                        <option value={1}>1 Star</option>
-                      </select>
-
-                      <label htmlFor="comment">Comment</label>
-
-                      <textarea
-                        id="comment"
-                        value={reviewForm.comment}
-                        onChange={(event) =>
-                          setReviewForm({
-                            ...reviewForm,
-                            comment: event.target.value,
-                          })
-                        }
-                      />
-
-                      <button type="submit">Save Changes</button>
-
-                      <button
-                        type="button"
-                        onClick={() => setShowReviewForm(false)}
-                      >
-                        Cancel
-                      </button>
-                    </form>
-                  )}
-                </>
-              ) : (
-                <>
-                  {!showReviewForm ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowReviewForm(true)}
+                    <label htmlFor="rating">Rating</label>
+                    <select
+                      id="rating"
+                      value={reviewForm.rating}
+                      onChange={(event) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          rating: Number(event.target.value),
+                        })
+                      }
                     >
-                      Leave a Review
-                    </button>
-                  ) : (
-                    <form onSubmit={handleCreateReview}>
-                      <h3>Leave a Review</h3>
+                      <option value={5}>5 Stars</option>
+                      <option value={4}>4 Stars</option>
+                      <option value={3}>3 Stars</option>
+                      <option value={2}>2 Stars</option>
+                      <option value={1}>1 Star</option>
+                    </select>
 
-                      <label htmlFor="rating">Rating</label>
+                    <label htmlFor="comment">Comment</label>
+                    <textarea
+                      id="comment"
+                      value={reviewForm.comment}
+                      onChange={(event) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          comment: event.target.value,
+                        })
+                      }
+                    />
 
-                      <select
-                        id="rating"
-                        value={reviewForm.rating}
-                        onChange={(event) =>
-                          setReviewForm({
-                            ...reviewForm,
-                            rating: Number(event.target.value),
-                          })
-                        }
-                      >
-                        <option value={5}>5 Stars</option>
-                        <option value={4}>4 Stars</option>
-                        <option value={3}>3 Stars</option>
-                        <option value={2}>2 Stars</option>
-                        <option value={1}>1 Star</option>
-                      </select>
-
-                      <label htmlFor="comment">Comment</label>
-
-                      <textarea
-                        id="comment"
-                        value={reviewForm.comment}
-                        onChange={(event) =>
-                          setReviewForm({
-                            ...reviewForm,
-                            comment: event.target.value,
-                          })
-                        }
-                        placeholder="Share your experience..."
-                      />
-
-                      <button type="submit">Submit Review</button>
-
+                    <div className="inline-actions">
+                      <button type="submit" className="primary-btn">
+                        Save Changes
+                      </button>
                       <button
                         type="button"
+                        className="ghost-btn"
                         onClick={() => setShowReviewForm(false)}
                       >
                         Cancel
                       </button>
-                    </form>
-                  )}
-                </>
-              )}
+                    </div>
+                  </form>
+                )}
+              </>
+            ) : (
+              <>
+                {!showReviewForm ? (
+                  <button
+                    type="button"
+                    className="primary-btn"
+                    onClick={() => setShowReviewForm(true)}
+                  >
+                    Leave a Review
+                  </button>
+                ) : (
+                  <form onSubmit={handleCreateReview} className="review-form">
+                    <h3>Leave a Review</h3>
+
+                    <label htmlFor="rating">Rating</label>
+                    <select
+                      id="rating"
+                      value={reviewForm.rating}
+                      onChange={(event) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          rating: Number(event.target.value),
+                        })
+                      }
+                    >
+                      <option value={5}>5 Stars</option>
+                      <option value={4}>4 Stars</option>
+                      <option value={3}>3 Stars</option>
+                      <option value={2}>2 Stars</option>
+                      <option value={1}>1 Star</option>
+                    </select>
+
+                    <label htmlFor="comment">Comment</label>
+                    <textarea
+                      id="comment"
+                      value={reviewForm.comment}
+                      onChange={(event) =>
+                        setReviewForm({
+                          ...reviewForm,
+                          comment: event.target.value,
+                        })
+                      }
+                      placeholder="Share your experience..."
+                    />
+
+                    <div className="inline-actions">
+                      <button type="submit" className="primary-btn">
+                        Submit Review
+                      </button>
+                      <button
+                        type="button"
+                        className="ghost-btn"
+                        onClick={() => setShowReviewForm(false)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </>
+            )}
+          </section>
+        )}
+
+        <section className="workspace-layout">
+          <div className="workspace-panel workspace-summary-panel">
+            <div className="panel-header">
+              <h3>Order Details</h3>
             </div>
-          )}
-        </div>
-
-      <div className="chat-container">
-        <h3>Messages</h3>
-
-        <div className="chat-history">
-          {messages.length === 0 ? (
-            <p className="no-messages">No messages yet. Say hello!</p>
-          ) : (
-            messages.map((msg) => (
-              <div key={msg._id} className="chat-message">
-                <strong>{msg.sender?.username || "User"}: </strong>
-                <span>{msg.content}</span>
+            <div className="workspace-summary-grid">
+              <div>
+                <span className="summary-label">Service</span>
+                <strong>{order?.service?.title || "Unknown Service"}</strong>
               </div>
-            ))
-          )}
-        </div>
-
-        <form className="chat-input-form" onSubmit={handleSendMessage}>
-          <input
-            type="text"
-            className="chat-input"
-            placeholder="Type your message here..."
-            value={newMessage}
-            onChange={(event) => setNewMessage(event.target.value)}
-          ></input>
-          <button type="submit" className="send-btn">
-            Send
-          </button>
-        </form>
+              <div>
+                <span className="summary-label">Price</span>
+                <strong>{order?.price || 0} BHD</strong>
+              </div>
+              <div>
+                <span className="summary-label">Buyer</span>
+                <strong>{order?.buyer?.username || "Unknown buyer"}</strong>
+              </div>
+              <div>
+                <span className="summary-label">Seller</span>
+                <strong>{order?.seller?.username || "Unknown seller"}</strong>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 

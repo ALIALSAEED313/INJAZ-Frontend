@@ -1,17 +1,30 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
-import { getNotifications, markAsRead, markAllAsRead } from "../services/notificationService";
+import { useSettings } from "../context/SettingsContext";
+import AuthModal from "./AuthModal";
+import {
+  getNotifications,
+  markAsRead,
+  markAllAsRead,
+} from "../services/notificationService";
 
 function Navbar() {
   const { logout, user } = useAuth();
+  const { theme, setTheme, language, setLanguage, t } = useSettings();
   const navigate = useNavigate();
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [chatUnread, setChatUnread] = useState([]);
+  const [chatCount, setChatCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState("sign-in");
   const [activeTab, setActiveTab] = useState("unread"); // "unread" | "history"
   const dropdownRef = useRef(null);
+  const chatDropdownRef = useRef(null);
 
   useEffect(() => {
     if (!user) return;
@@ -40,9 +53,45 @@ function Navbar() {
   }, [user]);
 
   useEffect(() => {
+    if (!user) return;
+
+    async function fetchUnreadChats() {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:3000/chat/unread", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const chatList = data.conversations || [];
+        setChatUnread(chatList);
+        setChatCount(chatList.length);
+      } catch (err) {
+        console.error("Error fetching unread chats:", err);
+      }
+    }
+
+    fetchUnreadChats();
+    const interval = setInterval(fetchUnreadChats, 10000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
+  useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
+      }
+
+      if (
+        chatDropdownRef.current &&
+        !chatDropdownRef.current.contains(event.target)
+      ) {
+        setChatOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -54,7 +103,9 @@ function Navbar() {
       try {
         await markAsRead(notif._id);
         // Move from unread to read history
-        setUnreadNotifications((prev) => prev.filter((item) => item._id !== notif._id));
+        setUnreadNotifications((prev) =>
+          prev.filter((item) => item._id !== notif._id),
+        );
         setReadNotifications((prev) => [{ ...notif, isRead: true }, ...prev]);
         setUnreadCount((prev) => Math.max(0, prev - 1));
       } catch (err) {
@@ -86,239 +137,281 @@ function Navbar() {
     }
   }
 
+  async function handleChatOpen(conversation) {
+    try {
+      const token = localStorage.getItem("token");
+      await fetch(
+        `http://localhost:3000/chat/conversations/${conversation._id}/read`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    } catch (err) {
+      console.error("Error marking chat as read:", err);
+    }
+
+    setChatOpen(false);
+    navigate(`/chat/${conversation._id}`);
+  }
+
   return (
-    <nav className="navbar" style={{ 
-        position: "relative", 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        padding: "10px 20px" // Adds some breathing room around the edges
-      }}>
-      <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }} >
-      <div className="Injaz-brand">
-        <img src="src/assets/INJAZ-LOGO-tran.svg" className="injaz-logo" alt="Injaz Logo" className="injaz-logo" style={{ height: "70px", width: "auto" }}/>
-      </div>
-      
-      </Link>
+    <>
+      <nav className="site-navbar">
+        <Link to="/" className="navbar-brand">
+          <div className="injaz-brand">
+            <img
+              src="src/assets/INJAZ-LOGO-tran.svg"
+              className="injaz-logo"
+              alt="Injaz Logo"
+            />
+          </div>
+        </Link>
 
-      <div className="navbar-links" style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Link to="/">Home</Link>
-        <Link to="/services">Services</Link>
+        <div className="navbar-links">
+          <Link to="/">{t("home")}</Link>
+          <Link to="/services">{t("services")}</Link>
 
-        {user ? (
-          <>
-            <Link to="/dashboard">Dashboard</Link>
-            {user.isSeller && <Link to="/services/create">Create Service</Link>}
+          <div className="settings-controls">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              aria-label={t("switchToDarkMode")}
+              title={
+                theme === "dark"
+                  ? t("switchToLightMode")
+                  : t("switchToDarkMode")
+              }
+            >
+              <span>{theme === "dark" ? "☀️" : "🌙"}</span>
+            </button>
 
-            {/* Notification Bell Dropdown */}
-            <div ref={dropdownRef} style={{ position: "relative" }}>
-              <button
-                type="button"
-                onClick={() => setIsOpen(!isOpen)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  fontSize: "1.3rem",
-                  position: "relative",
-                  padding: "6px",
-                  display: "flex",
-                  alignItems: "center"
-                }}
-                aria-label="Notifications"
-              >
-                🔔
-                {unreadCount > 0 && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "0",
-                      right: "0",
-                      backgroundColor: "#ff4d4f",
-                      color: "#fff",
-                      borderRadius: "50%",
-                      padding: "2px 6px",
-                      fontSize: "11px",
-                      fontWeight: "bold",
-                      lineHeight: "1"
-                    }}
-                  >
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
+            <button
+              type="button"
+              className="language-toggle"
+              onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+              aria-label={
+                language === "en" ? t("switchToArabic") : t("switchToEnglish")
+              }
+              title={
+                language === "en" ? t("switchToArabic") : t("switchToEnglish")
+              }
+            >
+              {language === "en" ? "AR" : "EN"}
+            </button>
+          </div>
 
-              {isOpen && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: 0,
-                    top: "40px",
-                    width: "340px",
-                    backgroundColor: "#fff",
-                    boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
-                    borderRadius: "8px",
-                    zIndex: 1000,
-                    overflow: "hidden",
-                    border: "1px solid #e2e8f0"
-                  }}
+          {user ? (
+            <>
+              <Link to="/dashboard">{t("dashboard")}</Link>
+
+              <div ref={chatDropdownRef} className="notification-wrap">
+                <button
+                  type="button"
+                  className="notification-button chat-button"
+                  onClick={() => setChatOpen(!chatOpen)}
+                  aria-label={t("unreadChats")}
                 >
-                  <div
-                    style={{
-                      padding: "12px 16px",
-                      borderBottom: "1px solid #edf2f7",
-                      display: "flex",
-                      justify: "space-between",
-                      alignItems: "center",
-                      backgroundColor: "#f7fafc"
-                    }}
-                  >
-                    <span style={{ fontWeight: "bold", fontSize: "14px" }}>Notifications</span>
-                    {unreadNotifications.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={handleMarkAllRead}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          color: "#0070f3",
-                          fontSize: "12px",
-                          cursor: "pointer",
-                          fontWeight: "500"
-                        }}
-                      >
-                        Mark all read
-                      </button>
-                    )}
-                  </div>
+                  💬
+                  {chatCount > 0 && (
+                    <span className="notification-badge">{chatCount}</span>
+                  )}
+                </button>
 
-                  {/* Tabs: Unread vs History */}
-                  <div style={{ display: "flex", borderBottom: "1px solid #edf2f7" }}>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("unread")}
-                      style={{
-                        flex: 1,
-                        padding: "10px",
-                        border: "none",
-                        borderBottom: activeTab === "unread" ? "2px solid #0070f3" : "none",
-                        backgroundColor: activeTab === "unread" ? "#fff" : "#f7fafc",
-                        fontWeight: activeTab === "unread" ? "bold" : "normal",
-                        cursor: "pointer",
-                        fontSize: "13px"
-                      }}
-                    >
-                      Unread ({unreadNotifications.length})
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab("history")}
-                      style={{
-                        flex: 1,
-                        padding: "10px",
-                        border: "none",
-                        borderBottom: activeTab === "history" ? "2px solid #0070f3" : "none",
-                        backgroundColor: activeTab === "history" ? "#fff" : "#f7fafc",
-                        fontWeight: activeTab === "history" ? "bold" : "normal",
-                        cursor: "pointer",
-                        fontSize: "13px"
-                      }}
-                    >
-                      History ({readNotifications.length})
-                    </button>
-                  </div>
+                {chatOpen && (
+                  <div className="notification-dropdown">
+                    <div className="notification-header">
+                      <span>{t("unreadChats")}</span>
+                    </div>
 
-                  {/* Content List */}
-                  <div style={{ maxHeight: "300px", overflowY: "auto" }}>
-                    {activeTab === "unread" ? (
-                      unreadNotifications.length === 0 ? (
-                        <p style={{ padding: "16px", textAlign: "center", color: "#a0aec0", margin: 0, fontSize: "13px" }}>
-                          No unread notifications
+                    <div className="notification-list">
+                      {chatUnread.length === 0 ? (
+                        <p className="empty-notification">
+                          {t("noUnreadChats")}
                         </p>
                       ) : (
-                        unreadNotifications.map((notif) => (
+                        chatUnread.map((chat) => (
                           <div
-                            key={notif._id}
-                            onClick={() => handleNotificationClick(notif)}
-                            style={{
-                              padding: "12px 16px",
-                              borderBottom: "1px solid #edf2f7",
-                              cursor: "pointer",
-                              backgroundColor: "#ebf8ff",
-                              transition: "background 0.2s"
-                            }}
+                            key={chat._id}
+                            className="notification-item unread"
+                            onClick={() => handleChatOpen(chat)}
                           >
-                            <div style={{ fontWeight: "bold", fontSize: "13px", color: "#2b6cb0" }}>
-                              {notif.title}
+                            <div className="notification-title">
+                              {chat.participant?.name ||
+                                chat.participant?.username}
                             </div>
-                            <div style={{ fontSize: "12px", color: "#4a5568", marginTop: "4px" }}>
-                              {notif.message}
+                            <div className="notification-message">
+                              {chat.lastMessage?.content || t("messages")}
                             </div>
-                            <div style={{ fontSize: "10px", color: "#a0aec0", marginTop: "4px" }}>
-                              {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <div className="notification-time">
+                              {chat.unreadCount} {t("unread")}
                             </div>
                           </div>
                         ))
-                      )
-                    ) : (
-                      readNotifications.length === 0 ? (
-                        <p style={{ padding: "16px", textAlign: "center", color: "#a0aec0", margin: 0, fontSize: "13px" }}>
-                          No notification history
-                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Link to="/chat" className="nav-chat-link">
+                {t("chat")}
+              </Link>
+              {user.isSeller && (
+                <Link to="/services/create">{t("createService")}</Link>
+              )}
+
+              <div ref={dropdownRef} className="notification-wrap">
+                <button
+                  type="button"
+                  onClick={() => setIsOpen(!isOpen)}
+                  className="notification-button"
+                  aria-label="Notifications"
+                >
+                  🔔
+                  {unreadCount > 0 && (
+                    <span className="notification-badge">{unreadCount}</span>
+                  )}
+                </button>
+
+                {isOpen && (
+                  <div className="notification-dropdown">
+                    <div className="notification-header">
+                      <span>{t("notifications")}</span>
+                      {unreadNotifications.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={handleMarkAllRead}
+                          className="mark-read-btn"
+                        >
+                          {t("markAllRead")}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="notification-tabs">
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("unread")}
+                        className={activeTab === "unread" ? "active" : ""}
+                      >
+                        {t("unread")} ({unreadNotifications.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab("history")}
+                        className={activeTab === "history" ? "active" : ""}
+                      >
+                        {t("history")} ({readNotifications.length})
+                      </button>
+                    </div>
+
+                    <div className="notification-list">
+                      {activeTab === "unread" ? (
+                        unreadNotifications.length === 0 ? (
+                          <p className="empty-notification">{t("noUnread")}</p>
+                        ) : (
+                          unreadNotifications.map((notif) => (
+                            <div
+                              key={notif._id}
+                              onClick={() => handleNotificationClick(notif)}
+                              className="notification-item unread"
+                            >
+                              <div className="notification-title">
+                                {notif.title}
+                              </div>
+                              <div className="notification-message">
+                                {notif.message}
+                              </div>
+                              <div className="notification-time">
+                                {new Date(notif.createdAt).toLocaleTimeString(
+                                  [],
+                                  { hour: "2-digit", minute: "2-digit" },
+                                )}
+                              </div>
+                            </div>
+                          ))
+                        )
+                      ) : readNotifications.length === 0 ? (
+                        <p className="empty-notification">{t("noHistory")}</p>
                       ) : (
                         readNotifications.map((notif) => (
                           <div
                             key={notif._id}
                             onClick={() => handleNotificationClick(notif)}
-                            style={{
-                              padding: "12px 16px",
-                              borderBottom: "1px solid #edf2f7",
-                              cursor: "pointer",
-                              backgroundColor: "#fff"
-                            }}
+                            className="notification-item"
                           >
-                            <div style={{ fontWeight: "500", fontSize: "13px", color: "#4a5568" }}>
+                            <div className="notification-title">
                               {notif.title}
                             </div>
-                            <div style={{ fontSize: "12px", color: "#718096", marginTop: "4px" }}>
+                            <div className="notification-message">
                               {notif.message}
                             </div>
-                            <div style={{ fontSize: "10px", color: "#a0aec0", marginTop: "4px" }}>
-                              {new Date(notif.createdAt).toLocaleDateString()} {new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            <div className="notification-time">
+                              {new Date(notif.createdAt).toLocaleDateString()}{" "}
+                              {new Date(notif.createdAt).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
                             </div>
                           </div>
                         ))
-                      )
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            <Link to={`/profile/${user._id}`} className="profile-avatar-link">
-              <img
-                src={user?.avatarUrl}
-                alt="Profile"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  display: 'block',
-                  border: '2px solid #ccc'
+              <Link to="/my-profile" className="profile-avatar-link">
+                <img
+                  src={user?.avatarUrl}
+                  alt="Profile"
+                  className="profile-avatar"
+                />
+              </Link>
+              <button onClick={logout} className="logout-btn">
+                {t("signOut")}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="auth-link-button"
+                onClick={() => {
+                  setAuthMode("sign-up");
+                  setAuthOpen(true);
                 }}
-              />
-            </Link>
-            <button onClick={logout} className="logout-btn">Sign Out</button>
-          </>
-        ) : (
-          <>
-            <Link to="/sign-up">Sign Up</Link>
-            <Link to="/sign-in">Sign In</Link>
-          </>
-        )}
-      </div>
-    </nav>
+              >
+                {t("signUp")}
+              </button>
+              <button
+                type="button"
+                className="auth-link-button"
+                onClick={() => {
+                  setAuthMode("sign-in");
+                  setAuthOpen(true);
+                }}
+              >
+                {t("signIn")}
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+
+      <AuthModal
+        isOpen={authOpen}
+        initialMode={authMode}
+        onClose={() => setAuthOpen(false)}
+      />
+    </>
   );
 }
 

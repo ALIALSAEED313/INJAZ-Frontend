@@ -5,9 +5,11 @@ import { useNavigate } from "react-router";
 
 import { signIn } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
+import { useSettings } from "../context/SettingsContext";
 
 const SignInForm = () => {
   const { setUser } = useAuth();
+  const { t, language } = useSettings();
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({
@@ -25,7 +27,15 @@ const SignInForm = () => {
       const signedInUser = await signIn(formData);
 
       setUser(signedInUser);
-      navigate("/dashboard");
+
+      const isFirstSignIn = !localStorage.getItem("profilePromptSeen");
+      if (isFirstSignIn) {
+        localStorage.setItem("profilePromptSeen", "true");
+      }
+
+      navigate("/dashboard", {
+        state: { openProfileSetup: isFirstSignIn },
+      });
     } catch (err) {
       console.log(`Error: ${err}`);
       setError(err?.response?.data?.message);
@@ -33,39 +43,64 @@ const SignInForm = () => {
   }
 
   return (
-    <main>
-      <h1>Sign In</h1>
-      <p className="error">{error}</p>
-      <form autoComplete="off" onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Username:</label>
-          <input
-            type="text"
+    <main className="auth-page">
+      <div className="auth-shell auth-shell-signin">
+        <div className="auth-visual-panel">
+          <span className="auth-kicker">{t("welcomeBack")}</span>
+          <h1>{t("signInWorkspace")}</h1>
+          <p>
+            {language === "ar"
+              ? "تتبع المشاريع والرسائل والطلبات ونشاطك المستقل في مكان واحد."
+              : "Track projects, messages, orders, and your freelance activity in one place."}
+          </p>
+          <ul className="auth-feature-list">
+            <li>{t("manageActiveOrders")}</li>
+            <li>{t("reviewNotifications")}</li>
+            <li>{t("accessProfile")}</li>
+          </ul>
+        </div>
+
+        <div className="auth-form-panel">
+          <h2>{t("signIn")}</h2>
+          <p className="error">{error}</p>
+          <form
             autoComplete="off"
-            id="username"
-            value={formData.username}
-            name="username"
-            onChange={handleChange}
-            required
-          />
+            onSubmit={handleSubmit}
+            className="auth-form"
+          >
+            <div>
+              <label htmlFor="username">{t("username")}</label>
+              <input
+                type="text"
+                autoComplete="off"
+                id="username"
+                value={formData.username}
+                name="username"
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="password">{t("password")}</label>
+              <input
+                type="password"
+                autoComplete="off"
+                id="password"
+                value={formData.password}
+                name="password"
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="auth-actions">
+              <button type="submit">{t("signIn")}</button>
+              <button type="button" onClick={() => navigate("/")}>
+                {t("cancel")}
+              </button>
+            </div>
+          </form>
         </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            autoComplete="off"
-            id="password"
-            value={formData.password}
-            name="password"
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <button>Sign In</button>
-          <button onClick={() => navigate("/")}>Cancel</button>
-        </div>
-      </form>
+      </div>
     </main>
   );
 };
