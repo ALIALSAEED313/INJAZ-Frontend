@@ -111,12 +111,6 @@ function App() {
           }
         />
         <Route path="/profile/:id" element={<ProfilePage />} />
-<<<<<<< HEAD
-        <Route path="/freelancer/:id" element={<ProfilePage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/404" element={<NotFoundPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-=======
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/404" element={<NotFoundPage />} />
         <Route path="*" element={<NotFoundPage />} />
@@ -128,7 +122,6 @@ function App() {
             </AdminProtectedRoute>
           }
         />
->>>>>>> c4e9a046d81f5dda58ff56254d037575d82be933
       </Routes>
       <Footer />
     </div>
