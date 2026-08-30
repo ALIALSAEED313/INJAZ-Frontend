@@ -110,6 +110,8 @@ function Navbar() {
             <Link to="/dashboard">Dashboard</Link>
             {user.isSeller && <Link to="/services/create">Create Service</Link>}
 
+            {user?.role === "admin" && (<Link to="/admin">Admin</Link>)}
+
             {/* Notification Bell Dropdown */}
             <div ref={dropdownRef} style={{ position: "relative" }}>
               <button
@@ -295,7 +297,7 @@ function Navbar() {
               )}
             </div>
 
-            <Link to={`/profile/${user._id}`} className="profile-avatar-link">
+            <Link to={`/my-profile`} className="profile-avatar-link">
               <img
                 src={user?.avatarUrl}
                 alt="Profile"
