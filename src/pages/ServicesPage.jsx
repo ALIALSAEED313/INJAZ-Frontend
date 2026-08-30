@@ -99,14 +99,19 @@ function ServicesPage() {
                   <p>
                     {service.category} By:{" "}
                     <Link
+<<<<<<< HEAD
                       to={`/profile/${service.freelencer?._id}`}
                       style={{
                         textDecoration: "underline",
                         color: "blue",
                         fontWeight: "bold",
                       }}
+=======
+                      to={`/profile/${service.freelancer?._id}`}
+                      style={{ textDecoration: 'underline', color: 'blue', fontWeight: 'bold' }}
+>>>>>>> 92a82cd6e830d1e41ec7664e944109195bf9dadb
                     >
-                      {service.freelencer?.username || "Unknown Freelancer"}
+                      {service.freelancer?.username || "Unknown Freelancer"}
                     </Link>
                   </p>
                 </span>
