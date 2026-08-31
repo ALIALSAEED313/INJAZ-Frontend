@@ -169,15 +169,11 @@ function Navbar() {
           padding: "10px 20px",
         }}
       >
-<<<<<<< HEAD
         <Link
           to="/"
           className="navbar-brand"
           style={{ textDecoration: "none" }}
         >
-=======
-        <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }}>
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
           <div className="Injaz-brand">
             <img
               src="src/assets/image.svg"
@@ -199,26 +195,16 @@ function Navbar() {
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label={t("switchToDarkMode")}
               title={
-                theme === "dark" ? t("switchToLightMode") : t("switchToDarkMode")
+                theme === "dark"
+                  ? t("switchToLightMode")
+                  : t("switchToDarkMode")
               }
             >
               <span>{theme === "dark" ? "☀️" : "🌙"}</span>
             </button>
-<<<<<<< HEAD
-
-            <button
-              type="button"
-              className="language-toggle"
-              onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-            >
-              {language === "en" ? "AR" : "EN"}
-            </button>
-          </div>
-=======
           </div>
 
           {user?.role === "admin" && <Link to="/admin">Admin</Link>}
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
 
           {user ? (
             <>
@@ -278,11 +264,7 @@ function Navbar() {
               <Link to="/chat" className="nav-chat-link">
                 {t("chat")}
               </Link>
-<<<<<<< HEAD
 
-=======
-              
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
               {user.isSeller && (
                 <Link to="/services/create">{t("createService")}</Link>
               )}
@@ -395,11 +377,7 @@ function Navbar() {
                 )}
               </div>
 
-<<<<<<< HEAD
-              <Link to="/my-profile" className="profile-avatar-link">
-=======
               <Link to={`/my-profile`} className="profile-avatar-link">
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
                 <img
                   src={user?.avatarUrl || "https://via.placeholder.com/40"}
                   alt="Profile"
@@ -413,20 +391,6 @@ function Navbar() {
                   }}
                 />
               </Link>
-<<<<<<< HEAD
-
-              <button
-                type="button"
-                className="auth-link-button"
-                onClick={() => {
-                  logout();
-                  navigate("/");
-                }}
-              >
-                {t("signOut")}
-              </button>
-=======
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
             </>
           ) : (
             <>

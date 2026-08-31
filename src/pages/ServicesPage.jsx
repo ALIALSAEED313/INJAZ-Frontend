@@ -257,15 +257,7 @@ function ServicesPage() {
 
                 <div className="service-tile-content">
                   <p className="service-tile-meta">
-<<<<<<< HEAD
-                    {categoryTranslations[service.category?.toLowerCase()] ||
-                      translateServiceText(service.category) ||
-                      service.category ||
-                      (language === "ar" ? "خدمة" : "Service")}{" "}
-                    {language === "ar" ? "بواسطة" : "By:"}{" "}
-=======
                     {service.category} {language === "ar" ? "بواسطة:" : "By:"}{" "}
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
                     <Link
                       to={`/profile/${service.freelancer?._id}`}
                       className="service-tile-profile-link"
@@ -276,22 +268,13 @@ function ServicesPage() {
                           : "Unknown Freelancer")}
                     </Link>
                   </p>
-<<<<<<< HEAD
 
-                  <h2>
-                    {translateServiceText(service.title) || service.title}
-                  </h2>
-                  <p className="service-tile-description">
-                    {translateServiceText(service.description) ||
-                      service.description}
-                  </p>
-=======
-                  
                   <h2>{service.title}</h2>
-                  
-                  <p className="service-tile-description">{service.description}</p>
+
+                  <p className="service-tile-description">
+                    {service.description}
+                  </p>
                 </div>
->>>>>>> 2542f149a4486b29c94b020f577c07771074a573
 
                 {/* قسم السعر ومدة التسليم */}
                 <div className="card-footer">
