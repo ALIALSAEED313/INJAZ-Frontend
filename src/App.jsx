@@ -26,6 +26,8 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PolicyAgreementModal from "./components/PolicyAgreementModal";
 import PaymentCallback from "./pages/PaymentCallback";
 import PaymentDetailsPage from "./pages/PaymentDetailsPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import { useAuth } from "./context/AuthContext";
 import { useSettings } from "./context/SettingsContext";
 
@@ -196,6 +198,8 @@ function App() {
             }
           />
           <Route path="/payment/callback" element={<PaymentCallback />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </main>
       <Footer />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router"; // 👈 تم إضافة Link هنا
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
 import { signIn, signUp } from "../services/authService";
@@ -352,11 +352,17 @@ function AuthModal({ isOpen, onClose, initialMode = "sign-in" }) {
                     <input type="checkbox" />
                     <span>{language === "ar" ? "تذكرني" : "Remember me"}</span>
                   </label>
-                  <button type="button" className="link-button">
+                  
+                  {/* 👇 التعديل تم هنا: استخدام Link مع تمرير onClose لإغلاق النافذة */}
+                  <Link 
+                    to="/forgot-password" 
+                    className="link-button"
+                    onClick={onClose}
+                  >
                     {language === "ar"
                       ? "نسيت كلمة المرور؟"
                       : "Forgot password?"}
-                  </button>
+                  </Link>
                 </div>
 
                 {errors.submit && (

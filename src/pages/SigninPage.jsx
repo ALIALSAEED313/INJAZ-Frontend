@@ -1,7 +1,7 @@
 // src/components/SignInForm/SignInForm.jsx
 
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router"; // تم إضافة Link هنا
 
 import { signIn } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
@@ -109,7 +109,23 @@ const SignInForm = () => {
                 onBlur={handleFieldBlur}
                 required
               />
+              
+              {/* رابط نسيان كلمة المرور */}
+              <div style={{ textAlign: "right", marginTop: "8px" }}>
+                <Link
+                  to="/forgot-password"
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--khamsat-green, #1ba84c)",
+                    textDecoration: "none",
+                    fontWeight: "600"
+                  }}
+                >
+                  {language === "ar" ? "نسيت كلمة المرور؟" : "Forgot Password?"}
+                </Link>
+              </div>
             </div>
+            
             <div className="auth-actions">
               <button type="submit">{t("signIn")}</button>
               <button type="button" onClick={() => navigate("/")}>
