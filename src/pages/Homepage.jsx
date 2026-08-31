@@ -15,74 +15,157 @@ function Homepage() {
   const [popularSearches, setPopularSearches] = useState([]);
   const categories = [
     {
-      name: "Web Development",
+      name: language === "ar" ? "تطوير الويب" : "Web Development",
       value: "web development",
       icon: "💻",
-      description: "Websites, apps & software",
+      description:
+        language === "ar"
+          ? "مواقع، تطبيقات وبرامج"
+          : "Websites, apps & software",
     },
     {
-      name: "Graphic Design",
+      name: language === "ar" ? "تطوير التطبيقات" : "Mobile App Development",
+      value: "mobile app development",
+      icon: "📱",
+      description:
+        language === "ar" ? "تطبيقات الهاتف" : "Mobile apps and interfaces",
+    },
+    {
+      name: language === "ar" ? "تطوير البرمجيات" : "Software Development",
+      value: "software development",
+      icon: "🧩",
+      description:
+        language === "ar" ? "حلول وعمليات برمجية" : "Custom software solutions",
+    },
+    {
+      name: language === "ar" ? "التصميم الجرافيكي" : "Graphic Design",
       value: "graphic design",
       icon: "🎨",
-      description: "Logos, branding & graphics",
+      description:
+        language === "ar"
+          ? "شعارات وهويات بصرية"
+          : "Logos, branding & graphics",
     },
     {
-      name: "Digital Marketing",
-      value: "digital marketing",
-      icon: "📈",
-      description: "SEO, ads & social media",
+      name: language === "ar" ? "تصميم واجهات المستخدم" : "UI/UX Design",
+      value: "ui/ux design",
+      icon: "🖌️",
+      description:
+        language === "ar"
+          ? "تجربة مستخدم وتصميم"
+          : "User experience and interface design",
     },
     {
-      name: "Video Editing",
-      value: "video editing",
+      name:
+        language === "ar" ? "الفيديو والرسوم المتحركة" : "Video & Animation",
+      value: "video & animation",
       icon: "🎬",
-      description: "Videos, editing & animation",
+      description:
+        language === "ar"
+          ? "مونتاج ومحتوى مرئي"
+          : "Videos, editing & animation",
     },
     {
-      name: "Writing",
-      value: "writing",
-      icon: "✍️",
-      description: "Articles & copywriting",
-    },
-    {
-      name: "Business",
-      value: "business",
-      icon: "💼",
-      description: "Consulting & business",
-    },
-    {
-      name: "AI Services",
-      value: "ai services",
-      icon: "🤖",
-      description: "AI automation & solutions",
-    },
-    {
-      name: "Photography",
+      name: language === "ar" ? "التصوير" : "Photography",
       value: "photography",
       icon: "📷",
-      description: "Photography & editing",
+      description:
+        language === "ar" ? "تصوير وتحرير الصور" : "Photography & editing",
+    },
+    {
+      name: language === "ar" ? "الكتابة والترجمة" : "Writing & Translation",
+      value: "writing & translation",
+      icon: "✍️",
+      description:
+        language === "ar" ? "مقالات وترجمة" : "Articles & copywriting",
+    },
+    {
+      name: language === "ar" ? "التسويق الرقمي" : "Digital Marketing",
+      value: "digital marketing",
+      icon: "📈",
+      description:
+        language === "ar" ? "إعلانات وتسويق" : "SEO, ads & social media",
+    },
+    {
+      name:
+        language === "ar"
+          ? "إدارة الشبكات الاجتماعية"
+          : "Social Media Management",
+      value: "social media management",
+      icon: "📱",
+      description:
+        language === "ar" ? "تنمية المحتوى" : "Content and community growth",
+    },
+    {
+      name: language === "ar" ? "تحسين محركات البحث" : "SEO",
+      value: "seo",
+      icon: "🔎",
+      description:
+        language === "ar" ? "تحسين الظهور" : "Search visibility and rankings",
+    },
+    {
+      name: language === "ar" ? "الأعمال والاستشارات" : "Business & Consulting",
+      value: "business & consulting",
+      icon: "💼",
+      description:
+        language === "ar" ? "استشارات وتخطيط" : "Consulting & business growth",
+    },
+    {
+      name:
+        language === "ar"
+          ? "علوم البيانات والذكاء الاصطناعي"
+          : "Data Science & AI",
+      value: "data science & ai",
+      icon: "🤖",
+      description: language === "ar" ? "حلول ذكية" : "AI automation & insights",
+    },
+    {
+      name: language === "ar" ? "الموسيقى والصوت" : "Music & Audio",
+      value: "music & audio",
+      icon: "🎵",
+      description:
+        language === "ar" ? "محتوى صوتي" : "Audio production and sound design",
+    },
+    {
+      name: language === "ar" ? "المحاسبة والمالية" : "Accounting & Finance",
+      value: "accounting & finance",
+      icon: "💰",
+      description:
+        language === "ar" ? "تحليل وتمويل" : "Accounting and financial support",
     },
   ];
   const steps = [
     {
       number: "01",
-      title: "Find a Service",
-      description: "Search for exactly what you need from our marketplace.",
+      title: language === "ar" ? "ابحث عن خدمة" : "Find a Service",
+      description:
+        language === "ar"
+          ? "ابحث عن ما تحتاجه بالضبط من خلال السوق الخاص بنا."
+          : "Search for exactly what you need from our marketplace.",
     },
     {
       number: "02",
-      title: "Choose a Freelancer",
-      description: "Compare services, prices and freelancer ratings.",
+      title: language === "ar" ? "اختر مستفيدا" : "Choose a Freelancer",
+      description:
+        language === "ar"
+          ? "قارن الخدمات والأسعار وتقييمات المستقلين."
+          : "Compare services, prices and freelancer ratings.",
     },
     {
       number: "03",
-      title: "Place Your Order",
-      description: "Choose your service and communicate with the freelancer.",
+      title: language === "ar" ? "ضع طلبك" : "Place Your Order",
+      description:
+        language === "ar"
+          ? "اختر الخدمة وتواصل مباشرة مع المستقل."
+          : "Choose your service and communicate with the freelancer.",
     },
     {
       number: "04",
-      title: "Get Your Work",
-      description: "Receive your completed work and leave a review.",
+      title: language === "ar" ? "استلم عملك" : "Get Your Work",
+      description:
+        language === "ar"
+          ? "استلم العمل المكتمل وترك تقييمك."
+          : "Receive your completed work and leave a review.",
     },
   ];
   useEffect(() => {
@@ -100,7 +183,11 @@ function Homepage() {
   async function performSearch(searchTerm) {
     const term = searchTerm.trim();
     if (!term) {
-      setError("Please enter something to search for.");
+      setError(
+        language === "ar"
+          ? "يرجى إدخال شيء للبحث عنه."
+          : "Please enter something to search for.",
+      );
       return;
     }
     try {
@@ -111,7 +198,11 @@ function Homepage() {
       setServices(data?.services || []);
     } catch (err) {
       console.error(err);
-      setError("Failed to search services. Please try again.");
+      setError(
+        language === "ar"
+          ? "فشل البحث عن الخدمات. يرجى المحاولة مرة أخرى."
+          : "Failed to search services. Please try again.",
+      );
       setServices([]);
     } finally {
       setLoading(false);
@@ -247,7 +338,8 @@ function Homepage() {
                     <h3>{service.title}</h3>
                     <p>{service.description}</p>
                     <div className="service-rating">
-                      ⭐ {service.rating || "New"}
+                      ⭐{" "}
+                      {service.rating || (language === "ar" ? "جديد" : "New")}
                     </div>
                     <div className="service-footer">
                       <span>{t("startingAt")}</span>
@@ -292,9 +384,15 @@ function Homepage() {
       </section>
       <section className="how-it-works">
         <div className="section-header centered">
-          <span className="section-label">SIMPLE PROCESS</span>
-          <h2>How INJAZ works</h2>
-          <p>Getting professional work done is simple.</p>
+          <span className="section-label">
+            {language === "ar" ? "عملية بسيطة" : "SIMPLE PROCESS"}
+          </span>
+          <h2>{language === "ar" ? "كيف يعمل INJAZ" : "How INJAZ works"}</h2>
+          <p>
+            {language === "ar"
+              ? "إنجاز العمل المهني أصبح سهلاً."
+              : "Getting professional work done is simple."}
+          </p>
         </div>
         <div className="steps">
           {steps.map((step) => (
@@ -308,32 +406,61 @@ function Homepage() {
       </section>
       <section className="trust">
         <div className="trust-content">
-          <span className="section-label">WHY INJAZ</span>
-          <h2>Everything you need in one place</h2>
+          <span className="section-label">
+            {language === "ar" ? "لماذا INJAZ" : "WHY INJAZ"}
+          </span>
+          <h2>
+            {language === "ar"
+              ? "كل ما تحتاجه في مكان واحد"
+              : "Everything you need in one place"}
+          </h2>
           <p>
-            Discover freelancers, compare services, communicate with sellers and
-            get your project completed.
+            {language === "ar"
+              ? "اكتشف المستقلين وقارن الخدمات وتواصل مع البائعين واستلمه مشروعك."
+              : "Discover freelancers, compare services, communicate with sellers and get your project completed."}
           </p>
           <div className="trust-features">
             <div>
               <span>🔍</span>
               <div>
-                <h3>Find the Right Service</h3>
-                <p>Search and browse services based on your needs.</p>
+                <h3>
+                  {language === "ar"
+                    ? "ابحث عن الخدمة المناسبة"
+                    : "Find the Right Service"}
+                </h3>
+                <p>
+                  {language === "ar"
+                    ? "ابحث وتصفح الخدمات بناءً على احتياجك."
+                    : "Search and browse services based on your needs."}
+                </p>
               </div>
             </div>
             <div>
               <span>⭐</span>
               <div>
-                <h3>Compare Freelancers</h3>
-                <p>Compare prices, ratings and service details.</p>
+                <h3>
+                  {language === "ar"
+                    ? "قارن بين المستقلين"
+                    : "Compare Freelancers"}
+                </h3>
+                <p>
+                  {language === "ar"
+                    ? "قارن الأسعار والتقييمات وتفاصيل الخدمة."
+                    : "Compare prices, ratings and service details."}
+                </p>
               </div>
             </div>
             <div>
               <span>💬</span>
               <div>
-                <h3>Direct Communication</h3>
-                <p>Discuss your project with the freelancer.</p>
+                <h3>
+                  {language === "ar" ? "تواصل مباشر" : "Direct Communication"}
+                </h3>
+                <p>
+                  {language === "ar"
+                    ? "ناقش مشروعك مباشرة مع المستقل."
+                    : "Discuss your project with the freelancer."}
+                </p>
               </div>
             </div>
           </div>
@@ -341,11 +468,23 @@ function Homepage() {
       </section>
       <section className="cta">
         <div>
-          <h2>Ready to get your project started?</h2>
-          <p>Find a freelancer or start offering your own services.</p>
+          <h2>
+            {language === "ar"
+              ? "هل أنت مستعد لبدء مشروعك؟"
+              : "Ready to get your project started?"}
+          </h2>
+          <p>
+            {language === "ar"
+              ? "اعثر على مستقل أو ابدأ بعرض خدماتك الخاصة."
+              : "Find a freelancer or start offering your own services."}
+          </p>
           <div className="cta-buttons">
-            <Link to="/services">Find a Freelancer</Link>
-            <Link to="/services/create">Become a Freelancer</Link>
+            <Link to="/services">
+              {language === "ar" ? "ابحث عن مستقل" : "Find a Freelancer"}
+            </Link>
+            <Link to="/services/create">
+              {language === "ar" ? "كن مستفيدا" : "Become a Freelancer"}
+            </Link>
           </div>
         </div>
       </section>

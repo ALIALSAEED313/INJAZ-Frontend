@@ -6,19 +6,32 @@ import { useNavigate } from "react-router";
 import { signIn } from "../services/authService";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
+import CatMascot from "../components/CatMascot";
 
 const SignInForm = () => {
   const { setUser } = useAuth();
   const { t, language } = useSettings();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [activeField, setActiveField] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
 
+  const catMode =
+    activeField === "password" ? "password" : activeField ? "focus" : "idle";
+
   function handleChange(event) {
     setFormData({ ...formData, [event.target.name]: event.target.value });
+  }
+
+  function handleFieldFocus(fieldName) {
+    setActiveField(fieldName);
+  }
+
+  function handleFieldBlur() {
+    setActiveField("");
   }
 
   async function handleSubmit(event) {
@@ -46,6 +59,7 @@ const SignInForm = () => {
     <main className="auth-page">
       <div className="auth-shell auth-shell-signin">
         <div className="auth-visual-panel">
+          <CatMascot mode={catMode} />
           <span className="auth-kicker">{t("welcomeBack")}</span>
           <h1>{t("signInWorkspace")}</h1>
           <p>
@@ -77,6 +91,8 @@ const SignInForm = () => {
                 value={formData.username}
                 name="username"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("username")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>
@@ -89,6 +105,8 @@ const SignInForm = () => {
                 value={formData.password}
                 name="password"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("password")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>

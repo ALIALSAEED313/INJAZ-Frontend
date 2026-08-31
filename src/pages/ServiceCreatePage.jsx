@@ -7,6 +7,76 @@ function CreateServicePage() {
   const navigate = useNavigate();
   const { t, language } = useSettings();
 
+  const categoryOptions = [
+    {
+      value: "web development",
+      labelEn: "Web Development",
+      labelAr: "تطوير الويب",
+    },
+    {
+      value: "mobile app development",
+      labelEn: "Mobile App Development",
+      labelAr: "تطوير التطبيقات",
+    },
+    {
+      value: "software development",
+      labelEn: "Software Development",
+      labelAr: "تطوير البرمجيات",
+    },
+    {
+      value: "graphic design",
+      labelEn: "Graphic Design",
+      labelAr: "التصميم الجرافيكي",
+    },
+    {
+      value: "ui/ux design",
+      labelEn: "UI/UX Design",
+      labelAr: "تصميم واجهات المستخدم",
+    },
+    {
+      value: "video & animation",
+      labelEn: "Video & Animation",
+      labelAr: "الفيديو والرسوم المتحركة",
+    },
+    { value: "photography", labelEn: "Photography", labelAr: "التصوير" },
+    {
+      value: "writing & translation",
+      labelEn: "Writing & Translation",
+      labelAr: "الكتابة والترجمة",
+    },
+    {
+      value: "digital marketing",
+      labelEn: "Digital Marketing",
+      labelAr: "التسويق الرقمي",
+    },
+    {
+      value: "social media management",
+      labelEn: "Social Media Management",
+      labelAr: "إدارة وسائل التواصل",
+    },
+    { value: "seo", labelEn: "SEO", labelAr: "تحسين محركات البحث" },
+    {
+      value: "business & consulting",
+      labelEn: "Business & Consulting",
+      labelAr: "الأعمال والاستشارات",
+    },
+    {
+      value: "data science & ai",
+      labelEn: "Data Science & AI",
+      labelAr: "علوم البيانات والذكاء الاصطناعي",
+    },
+    {
+      value: "music & audio",
+      labelEn: "Music & Audio",
+      labelAr: "الموسيقى والصوت",
+    },
+    {
+      value: "accounting & finance",
+      labelEn: "Accounting & Finance",
+      labelAr: "المحاسبة والمالية",
+    },
+  ];
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -149,34 +219,14 @@ function CreateServicePage() {
                 onChange={handleChange}
                 required
               >
-                <option value="">Select a category</option>
-                <option value="web development">Web Development</option>
-                <option value="mobile app development">
-                  Mobile App Development
+                <option value="">
+                  {language === "ar" ? "اختر فئة" : "Select a category"}
                 </option>
-                <option value="software development">
-                  Software Development
-                </option>
-                <option value="graphic design">Graphic Design</option>
-                <option value="ui/ux design">UI/UX Design</option>
-                <option value="video & animation">Video & Animation</option>
-                <option value="photography">Photography</option>
-                <option value="writing & translation">
-                  Writing & Translation
-                </option>
-                <option value="digital marketing">Digital Marketing</option>
-                <option value="social media management">
-                  Social Media Management
-                </option>
-                <option value="seo">SEO</option>
-                <option value="business & consulting">
-                  Business & Consulting
-                </option>
-                <option value="data science & ai">Data Science & AI</option>
-                <option value="music & audio">Music & Audio</option>
-                <option value="accounting & finance">
-                  Accounting & Finance
-                </option>
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {language === "ar" ? option.labelAr : option.labelEn}
+                  </option>
+                ))}
               </select>
             </div>
 

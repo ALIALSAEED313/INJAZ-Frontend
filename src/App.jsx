@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router";
 import Navbar from "./components/Navbar";
 import SignupPage from "./pages/SignupPage";
@@ -22,11 +23,72 @@ import SellerRoute from "./components/SellerRoute";
 import NotFoundPage from "./pages/NotFoundPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import PolicyAgreementModal from "./components/PolicyAgreementModal";
+import { useAuth } from "./context/AuthContext";
+import { useSettings } from "./context/SettingsContext";
+
+function PolicyAgreementGate() {
+  const { user } = useAuth();
+  const { language } = useSettings();
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      setIsOpen(false);
+      return;
+    }
+
+    const policyKey = "injaz-policy-agreement";
+    const saved = localStorage.getItem(policyKey);
+    const state = saved
+      ? JSON.parse(saved)
+      : { accepted: false, lastReminderAt: 0 };
+
+    if (state.accepted) {
+      setIsOpen(false);
+      return;
+    }
+
+    const lastReminder = Number(state.lastReminderAt || 0);
+    const reminderDue =
+      !lastReminder || Date.now() - lastReminder >= 24 * 60 * 60 * 1000;
+    setIsOpen(reminderDue);
+  }, [user, language]);
+
+  function savePolicyState(accepted) {
+    const policyKey = "injaz-policy-agreement";
+    const nextState = {
+      accepted,
+      lastReminderAt: accepted ? 0 : Date.now(),
+      updatedAt: Date.now(),
+    };
+    localStorage.setItem(policyKey, JSON.stringify(nextState));
+  }
+
+  function handleAgree() {
+    savePolicyState(true);
+    setIsOpen(false);
+  }
+
+  function handleRemindLater() {
+    savePolicyState(false);
+    setIsOpen(false);
+  }
+
+  return (
+    <PolicyAgreementModal
+      open={isOpen}
+      onAgree={handleAgree}
+      onRemindLater={handleRemindLater}
+    />
+  );
+}
 
 function App() {
   return (
     <div className="app-shell">
       <Navbar />
+      <PolicyAgreementGate />
       <Routes>
         <Route path="/" element={<Homepage />} />
         <Route path="/sign-up" element={<SignupPage />} />

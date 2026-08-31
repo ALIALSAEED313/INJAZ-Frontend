@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { getCurrentUser } from "../services/authService";
+import { useSettings } from "../context/SettingsContext";
 
 function ServiceDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { language } = useSettings();
+  const isArabic = language === "ar";
   const [service, setService] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState("");
@@ -229,6 +232,45 @@ function ServiceDetailsPage() {
     .slice(0, 2)
     .toUpperCase();
 
+  const categoryTranslation = {
+    "web development": isArabic ? "تطوير الويب" : "Web Development",
+    "mobile app development": isArabic
+      ? "تطوير التطبيقات"
+      : "Mobile App Development",
+    "software development": isArabic
+      ? "تطوير البرمجيات"
+      : "Software Development",
+    "graphic design": isArabic ? "التصميم الجرافيكي" : "Graphic Design",
+    "ui/ux design": isArabic ? "تصميم واجهات المستخدم" : "UI/UX Design",
+    "video & animation": isArabic
+      ? "الفيديو والرسوم المتحركة"
+      : "Video & Animation",
+    photography: isArabic ? "التصوير" : "Photography",
+    "writing & translation": isArabic
+      ? "الكتابة والترجمة"
+      : "Writing & Translation",
+    "digital marketing": isArabic ? "التسويق الرقمي" : "Digital Marketing",
+    "social media management": isArabic
+      ? "إدارة وسائل التواصل"
+      : "Social Media Management",
+    seo: isArabic ? "تحسين محركات البحث" : "SEO",
+    "business & consulting": isArabic
+      ? "الأعمال والاستشارات"
+      : "Business & Consulting",
+    "data science & ai": isArabic
+      ? "علوم البيانات والذكاء الاصطناعي"
+      : "Data Science & AI",
+    "music & audio": isArabic ? "الموسيقى والصوت" : "Music & Audio",
+    "accounting & finance": isArabic
+      ? "المحاسبة والمالية"
+      : "Accounting & Finance",
+  };
+
+  const serviceCategoryText =
+    categoryTranslation[service.category?.toLowerCase()] ||
+    service.category ||
+    (isArabic ? "الخدمة" : "Service");
+
   return (
     <main className="service-page">
       <div className="service-bg" />
@@ -243,13 +285,13 @@ function ServiceDetailsPage() {
           </div>
 
           <div className="nav-links">
-            <Link to="/services">Services</Link>
-            <Link to="/services">Explore</Link>
+            <Link to="/services">{isArabic ? "الخدمات" : "Services"}</Link>
+            <Link to="/services">{isArabic ? "استكشف" : "Explore"}</Link>
           </div>
 
           <Link to="/services" className="nav-back">
             <span>←</span>
-            Back
+            {isArabic ? "رجوع" : "Back"}
           </Link>
         </nav>
 
@@ -274,17 +316,21 @@ function ServiceDetailsPage() {
 
         <section className="hero-block">
           <div className="hero-content">
-            <span className="hero-badge">
-              {service.category || "WEB DEVELOPMENT"}
-            </span>
+            <span className="hero-badge">{serviceCategoryText}</span>
             <h1>{service.title}</h1>
             <p>{service.description}</p>
 
             <div className="meta-row">
               <span className="meta-pill">★ 5.0</span>
-              <span className="meta-pill">⚡ {service.deliveryTime} Days</span>
-              <span className="meta-pill">✓ Professional</span>
-              <span className="meta-pill">● Available</span>
+              <span className="meta-pill">
+                ⚡ {service.deliveryTime} {isArabic ? "أيام" : "Days"}
+              </span>
+              <span className="meta-pill">
+                ✓ {isArabic ? "مهني" : "Professional"}
+              </span>
+              <span className="meta-pill">
+                ● {isArabic ? "متاح" : "Available"}
+              </span>
             </div>
           </div>
         </section>
@@ -295,7 +341,9 @@ function ServiceDetailsPage() {
               <div className="panel-head">
                 <span className="panel-index">01</span>
                 <div className="panel-line" />
-                <span className="panel-label">The Service</span>
+                <span className="panel-label">
+                  {isArabic ? "الخدمة" : "The Service"}
+                </span>
               </div>
               <p>{service.description}</p>
             </section>
@@ -303,8 +351,14 @@ function ServiceDetailsPage() {
             <section className="panel benefit-panel">
               <div className="section-header">
                 <div>
-                  <p className="eyebrow">What you get</p>
-                  <h2>A complete creative workflow.</h2>
+                  <p className="eyebrow">
+                    {isArabic ? "ماذا ستحصل عليه" : "What you get"}
+                  </p>
+                  <h2>
+                    {isArabic
+                      ? "مسار إبداعي كامل."
+                      : "A complete creative workflow."}
+                  </h2>
                 </div>
               </div>
 
@@ -314,8 +368,12 @@ function ServiceDetailsPage() {
                     <span className="benefit-number">01</span>
                     <span className="benefit-icon violet">✦</span>
                   </div>
-                  <h3>Professional quality</h3>
-                  <p>High-quality work designed to match your exact goals.</p>
+                  <h3>{isArabic ? "جودة احترافية" : "Professional quality"}</h3>
+                  <p>
+                    {isArabic
+                      ? "عمل عالي الجودة مصمم ليلائم أهدافك بدقة."
+                      : "High-quality work designed to match your exact goals."}
+                  </p>
                 </article>
 
                 <article className="benefit-card benefit-card-xl">
@@ -323,10 +381,11 @@ function ServiceDetailsPage() {
                     <span className="benefit-number">02</span>
                     <span className="benefit-icon cyan">⚡</span>
                   </div>
-                  <h3>Fast delivery</h3>
+                  <h3>{isArabic ? "تسليم سريع" : "Fast delivery"}</h3>
                   <p>
-                    Timely execution with clear milestones and dependable
-                    scheduling.
+                    {isArabic
+                      ? "تنفيذ في الوقت المناسب مع مراحل واضحة وجدول زمني موثوق."
+                      : "Timely execution with clear milestones and dependable scheduling."}
                   </p>
                 </article>
 
@@ -335,10 +394,11 @@ function ServiceDetailsPage() {
                     <span className="benefit-number">03</span>
                     <span className="benefit-icon cyan">💬</span>
                   </div>
-                  <h3>Clear communication</h3>
+                  <h3>{isArabic ? "تواصل واضح" : "Clear communication"}</h3>
                   <p>
-                    Direct collaboration and streamlined updates from kickoff to
-                    launch.
+                    {isArabic
+                      ? "تعاون مباشر وتحديثات منظمة من البداية إلى الإطلاق."
+                      : "Direct collaboration and streamlined updates from kickoff to launch."}
                   </p>
                 </article>
 
@@ -347,10 +407,11 @@ function ServiceDetailsPage() {
                     <span className="benefit-number">04</span>
                     <span className="benefit-icon violet">✓</span>
                   </div>
-                  <h3>Reliable service</h3>
+                  <h3>{isArabic ? "خدمة موثوقة" : "Reliable service"}</h3>
                   <p>
-                    Consistency, precision, and a smooth experience from start
-                    to finish.
+                    {isArabic
+                      ? "التسلسل والدقة وتجربة سلسة من البداية إلى النهاية."
+                      : "Consistency, precision, and a smooth experience from start to finish."}
                   </p>
                 </article>
               </div>
@@ -359,10 +420,18 @@ function ServiceDetailsPage() {
             <section className="panel freelancer-panel">
               <div className="section-header compact">
                 <div>
-                  <p className="eyebrow">Freelancer</p>
-                  <h2>Trusted creative partner</h2>
+                  <p className="eyebrow">
+                    {isArabic ? "المستقل" : "Freelancer"}
+                  </p>
+                  <h2>
+                    {isArabic
+                      ? "شريك إبداعي موثوق"
+                      : "Trusted creative partner"}
+                  </h2>
                 </div>
-                <span className="online-pill">Online</span>
+                <span className="online-pill">
+                  {isArabic ? "متصل" : "Online"}
+                </span>
               </div>
 
               <div className="freelancer-card">
@@ -391,7 +460,7 @@ function ServiceDetailsPage() {
                       to={`/profile/${serviceFreelancerId}`}
                       className="button-secondary profile-button"
                     >
-                      View Seller Profile
+                      {isArabic ? "عرض ملف البائع" : "View Seller Profile"}
                     </Link>
                   )}
                 </div>
@@ -402,8 +471,8 @@ function ServiceDetailsPage() {
           <aside className="purchase-column">
             <div className="purchase-panel">
               <div className="purchase-header">
-                <span>Starting From</span>
-                <span className="ready-tag">Ready</span>
+                <span>{isArabic ? "يبدأ من" : "Starting From"}</span>
+                <span className="ready-tag">{isArabic ? "جاهز" : "Ready"}</span>
               </div>
 
               <div className="price-row">
@@ -415,15 +484,17 @@ function ServiceDetailsPage() {
                 <div className="detail-row">
                   <div className="detail-left">
                     <span className="detail-icon violet">⚡</span>
-                    <span>Delivery</span>
+                    <span>{isArabic ? "التسليم" : "Delivery"}</span>
                   </div>
-                  <strong>{service.deliveryTime} days</strong>
+                  <strong>
+                    {service.deliveryTime} {isArabic ? "أيام" : "days"}
+                  </strong>
                 </div>
 
                 <div className="detail-row">
                   <div className="detail-left">
                     <span className="detail-icon gold">★</span>
-                    <span>Rating</span>
+                    <span>{isArabic ? "التقييم" : "Rating"}</span>
                   </div>
                   <strong>5.0 / 5</strong>
                 </div>
@@ -431,9 +502,9 @@ function ServiceDetailsPage() {
                 <div className="detail-row">
                   <div className="detail-left">
                     <span className="detail-icon cyan">✓</span>
-                    <span>Professional</span>
+                    <span>{isArabic ? "مهني" : "Professional"}</span>
                   </div>
-                  <strong>Included</strong>
+                  <strong>{isArabic ? "مضمن" : "Included"}</strong>
                 </div>
               </div>
 
@@ -444,7 +515,7 @@ function ServiceDetailsPage() {
                       to={`/services/${id}/edit`}
                       className="button-primary purchase-button"
                     >
-                      <span>Edit Service</span>
+                      <span>{isArabic ? "تعديل الخدمة" : "Edit Service"}</span>
                       <span className="arrow-badge">→</span>
                     </Link>
 
@@ -454,7 +525,13 @@ function ServiceDetailsPage() {
                       disabled={deleting}
                       className="button-danger"
                     >
-                      {deleting ? "Deleting..." : "Delete Service"}
+                      {deleting
+                        ? isArabic
+                          ? "جارٍ الحذف..."
+                          : "Deleting..."
+                        : isArabic
+                          ? "حذف الخدمة"
+                          : "Delete Service"}
                     </button>
                   </>
                 ) : currentUser ? (
@@ -465,7 +542,13 @@ function ServiceDetailsPage() {
                     className="button-primary purchase-button"
                   >
                     <span>
-                      {ordering ? "Creating Order..." : "Order Service"}
+                      {ordering
+                        ? isArabic
+                          ? "جارٍ إنشاء الطلب..."
+                          : "Creating Order..."
+                        : isArabic
+                          ? "طلب الخدمة"
+                          : "Order Service"}
                     </span>
                     {!ordering && <span className="arrow-badge">→</span>}
                   </button>
@@ -474,7 +557,9 @@ function ServiceDetailsPage() {
                     to="/sign-in"
                     className="button-primary purchase-button"
                   >
-                    <span>Sign In to Order</span>
+                    <span>
+                      {isArabic ? "تسجيل الدخول للطلب" : "Sign In to Order"}
+                    </span>
                     <span className="arrow-badge">→</span>
                   </Link>
                 )}
@@ -482,7 +567,9 @@ function ServiceDetailsPage() {
 
               <div className="secure-note">
                 <span>🔒</span>
-                Secure transaction through INJAZ
+                {isArabic
+                  ? "معاملة آمنة عبر INJAZ"
+                  : "Secure transaction through INJAZ"}
               </div>
             </div>
           </aside>
@@ -490,8 +577,14 @@ function ServiceDetailsPage() {
 
         <section className="cta-panel">
           <div className="cta-copy">
-            <p>Ready to make it happen?</p>
-            <h2>Let&apos;s build something great.</h2>
+            <p>
+              {isArabic ? "هل أنت مستعد للبدء؟" : "Ready to make it happen?"}
+            </p>
+            <h2>
+              {isArabic
+                ? "لنصنع شيئاً رائعاً."
+                : "Let&apos;s build something great."}
+            </h2>
           </div>
 
           <button
@@ -505,7 +598,7 @@ function ServiceDetailsPage() {
               }
             }}
           >
-            Start Project
+            {isArabic ? "ابدأ المشروع" : "Start Project"}
             <span className="arrow-badge">→</span>
           </button>
         </section>

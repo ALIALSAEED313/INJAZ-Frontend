@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { signUp } from "../services/authService";
 import { useSettings } from "../context/SettingsContext";
+import CatMascot from "../components/CatMascot";
 
 function Signup() {
   const { t, language } = useSettings();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [activeField, setActiveField] = useState("");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -17,6 +19,8 @@ function Signup() {
   const [submitting, setSubmitting] = useState(false);
 
   const { username, email, password, passwordConf, accountType } = formData;
+  const catMode =
+    activeField === "password" ? "password" : activeField ? "focus" : "idle";
 
   function handleChange(event) {
     setError("");
@@ -24,6 +28,14 @@ function Signup() {
       ...formData,
       [event.target.name]: event.target.value,
     });
+  }
+
+  function handleFieldFocus(fieldName) {
+    setActiveField(fieldName);
+  }
+
+  function handleFieldBlur() {
+    setActiveField("");
   }
 
   async function handleSubmit(event) {
@@ -53,6 +65,7 @@ function Signup() {
     <main className="auth-page">
       <div className="auth-shell auth-shell-signup">
         <div className="auth-visual-panel">
+          <CatMascot mode={catMode} />
           <span className="auth-kicker">{t("createAccount")}</span>
           <h1>{t("joinFreelanceHiring")}</h1>
           <p>
@@ -80,6 +93,8 @@ function Signup() {
                 value={username}
                 name="username"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("username")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>
@@ -92,6 +107,8 @@ function Signup() {
                 value={email}
                 name="email"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("email")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>
@@ -118,6 +135,8 @@ function Signup() {
                 value={password}
                 name="password"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("password")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>
@@ -130,6 +149,8 @@ function Signup() {
                 value={passwordConf}
                 name="passwordConf"
                 onChange={handleChange}
+                onFocus={() => handleFieldFocus("password")}
+                onBlur={handleFieldBlur}
                 required
               />
             </div>

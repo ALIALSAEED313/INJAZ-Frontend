@@ -13,6 +13,90 @@ function ServicesPage() {
   const [error, setError] = useState("");
   const category = searchParams.get("category");
 
+  const categoryTranslations = {
+    "web development": language === "ar" ? "تطوير الويب" : "Web Development",
+    "mobile app development":
+      language === "ar" ? "تطوير التطبيقات" : "Mobile App Development",
+    "software development":
+      language === "ar" ? "تطوير البرمجيات" : "Software Development",
+    "graphic design":
+      language === "ar" ? "التصميم الجرافيكي" : "Graphic Design",
+    "ui/ux design":
+      language === "ar" ? "تصميم واجهات المستخدم" : "UI/UX Design",
+    "video & animation":
+      language === "ar" ? "الفيديو والرسوم المتحركة" : "Video & Animation",
+    photography: language === "ar" ? "التصوير" : "Photography",
+    "writing & translation":
+      language === "ar" ? "الكتابة والترجمة" : "Writing & Translation",
+    "digital marketing":
+      language === "ar" ? "التسويق الرقمي" : "Digital Marketing",
+    "social media management":
+      language === "ar" ? "إدارة وسائل التواصل" : "Social Media Management",
+    seo: language === "ar" ? "تحسين محركات البحث" : "SEO",
+    "business & consulting":
+      language === "ar" ? "الأعمال والاستشارات" : "Business & Consulting",
+    "data science & ai":
+      language === "ar"
+        ? "علوم البيانات والذكاء الاصطناعي"
+        : "Data Science & AI",
+    "music & audio": language === "ar" ? "الموسيقى والصوت" : "Music & Audio",
+    "accounting & finance":
+      language === "ar" ? "المحاسبة والمالية" : "Accounting & Finance",
+  };
+
+  const translateServiceText = (value) => {
+    if (language !== "ar" || !value) return value;
+
+    const replacements = {
+      web: "ويب",
+      website: "موقع",
+      app: "تطبيق",
+      mobile: "موبايل",
+      development: "تطوير",
+      design: "تصميم",
+      marketing: "تسويق",
+      video: "فيديو",
+      animation: "رسوم متحركة",
+      photography: "تصوير",
+      business: "أعمال",
+      consulting: "استشارات",
+      seo: "تحسين محركات البحث",
+      writing: "كتابة",
+      translation: "ترجمة",
+      social: "اجتماعي",
+      media: "وسائط",
+      finance: "مالية",
+      accounting: "محاسبة",
+      music: "موسيقى",
+      audio: "صوت",
+      data: "بيانات",
+      science: "علوم",
+      ai: "ذكاء اصطناعي",
+      service: "خدمة",
+      freelancer: "مستقل",
+      seller: "بائع",
+      project: "مشروع",
+      order: "طلب",
+      delivery: "تسليم",
+      days: "أيام",
+      from: "من",
+      ready: "جاهز",
+      secure: "آمن",
+      professional: "مهني",
+      quality: "جودة",
+      communication: "تواصل",
+      using: "استخدام",
+    };
+
+    let translated = String(value);
+    Object.entries(replacements).forEach(([key, valueAr]) => {
+      const regex = new RegExp(key, "gi");
+      translated = translated.replace(regex, valueAr);
+    });
+
+    return translated;
+  };
+
   useEffect(() => {
     async function loadServices() {
       try {
@@ -40,12 +124,26 @@ function ServicesPage() {
       <main className="services-page">
         <section className="services-hero">
           <div className="services-hero-copy">
-            <span className="section-label">Marketplace</span>
-            <h1>{category ? `${category} Services` : "All Services"}</h1>
+            <span className="section-label">
+              {language === "ar" ? "السوق" : "Marketplace"}
+            </span>
+            <h1>
+              {category
+                ? language === "ar"
+                  ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
+                  : `${category} Services`
+                : language === "ar"
+                  ? "جميع الخدمات"
+                  : "All Services"}
+            </h1>
             <p>
               {category
-                ? `Find the best ${category} services for your project.`
-                : "Find the right freelancer for your project."}
+                ? language === "ar"
+                  ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
+                  : `Find the best ${category} services for your project.`
+                : language === "ar"
+                  ? "اعثر على المستقل المناسب لمشروعك."
+                  : "Find the right freelancer for your project."}
             </p>
           </div>
         </section>
@@ -62,12 +160,26 @@ function ServicesPage() {
       <main className="services-page">
         <section className="services-hero">
           <div className="services-hero-copy">
-            <span className="section-label">Marketplace</span>
-            <h1>{category ? `${category} Services` : "All Services"}</h1>
+            <span className="section-label">
+              {language === "ar" ? "السوق" : "Marketplace"}
+            </span>
+            <h1>
+              {category
+                ? language === "ar"
+                  ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
+                  : `${category} Services`
+                : language === "ar"
+                  ? "جميع الخدمات"
+                  : "All Services"}
+            </h1>
             <p>
               {category
-                ? `Find the best ${category} services for your project.`
-                : "Find the right freelancer for your project."}
+                ? language === "ar"
+                  ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
+                  : `Find the best ${category} services for your project.`
+                : language === "ar"
+                  ? "اعثر على المستقل المناسب لمشروعك."
+                  : "Find the right freelancer for your project."}
             </p>
           </div>
         </section>
@@ -83,12 +195,26 @@ function ServicesPage() {
     <main className="services-page">
       <section className="services-hero">
         <div className="services-hero-copy">
-          <span className="section-label">Marketplace</span>
-          <h1>{category ? `${category} Services` : "All Services"}</h1>
+          <span className="section-label">
+            {language === "ar" ? "السوق" : "Marketplace"}
+          </span>
+          <h1>
+            {category
+              ? language === "ar"
+                ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
+                : `${category} Services`
+              : language === "ar"
+                ? "جميع الخدمات"
+                : "All Services"}
+          </h1>
           <p>
             {category
-              ? `Find the best ${category} services for your project.`
-              : "Find the right freelancer for your project."}
+              ? language === "ar"
+                ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
+                : `Find the best ${category} services for your project.`
+              : language === "ar"
+                ? "اعثر على المستقل المناسب لمشروعك."
+                : "Find the right freelancer for your project."}
           </p>
         </div>
 
@@ -131,18 +257,28 @@ function ServicesPage() {
 
                 <div className="service-tile-content">
                   <p className="service-tile-meta">
-                    {service.category} By:{" "}
+                    {categoryTranslations[service.category?.toLowerCase()] ||
+                      translateServiceText(service.category) ||
+                      service.category ||
+                      (language === "ar" ? "خدمة" : "Service")}{" "}
+                    {language === "ar" ? "بواسطة" : "By:"}{" "}
                     <Link
                       to={`/profile/${service.freelancer?._id}`}
                       className="service-tile-profile-link"
                     >
-                      {service.freelancer?.username || "Unknown Freelancer"}
+                      {service.freelancer?.username ||
+                        (language === "ar"
+                          ? "مستقل غير معروف"
+                          : "Unknown Freelancer")}
                     </Link>
                   </p>
 
-                  <h2>{service.title}</h2>
+                  <h2>
+                    {translateServiceText(service.title) || service.title}
+                  </h2>
                   <p className="service-tile-description">
-                    {service.description}
+                    {translateServiceText(service.description) ||
+                      service.description}
                   </p>
 
                   <div className="service-tile-price-row">
@@ -152,7 +288,8 @@ function ServicesPage() {
 
                   <p className="service-tile-delivery">
                     {language === "ar" ? "التسليم" : "Delivery"}:{" "}
-                    {service.deliveryTime} {t("days")}
+                    {service.deliveryTime}{" "}
+                    {language === "ar" ? "أيام" : t("days")}
                   </p>
 
                   <Link

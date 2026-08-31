@@ -233,7 +233,12 @@ body[data-theme="light"] .navbar-links a:focus {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.03);
   font-size: 1.2rem;
-  color: white;
+  color: var(--text);
+}
+
+body[data-theme="light"] .notification-button {
+  background: var(--panel-strong);
+  color: var(--text);
 }
 
 .notification-badge {
@@ -1905,11 +1910,17 @@ main {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 36px 36px;
   opacity: 0.2;
+}
+
+.auth-visual-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-kicker {
@@ -1957,6 +1968,206 @@ main {
   padding: 34px 28px;
 }
 
+.auth-cat-wrap {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0 14px;
+  width: 100%;
+}
+
+.auth-cat-svg {
+  display: block;
+  width: 220px;
+  height: auto;
+  filter: drop-shadow(0 16px 24px rgba(15, 23, 42, 0.28));
+  animation: none;
+}
+
+.cat-shadow-svg {
+  fill: rgba(15, 23, 42, 0.45);
+}
+
+.cat-body-svg {
+  fill: #f3c27a;
+  stroke: rgba(92, 59, 38, 0.7);
+  stroke-width: 3;
+}
+
+.cat-head-svg {
+  fill: #f7d48e;
+  stroke: rgba(92, 59, 38, 0.7);
+  stroke-width: 3;
+}
+
+.cat-ear-svg {
+  fill: #f4b861;
+  stroke: rgba(92, 59, 38, 0.7);
+  stroke-width: 3;
+}
+
+.eye-white {
+  fill: #fffaf8;
+  stroke: rgba(92, 59, 38, 0.7);
+  stroke-width: 2;
+}
+
+.eye-pupil {
+  fill: #201813;
+  transform-origin: center;
+  transform: none;
+  transition: none;
+}
+
+.auth-cat-svg[data-mode="focus"] .left-eye .eye-pupil,
+.auth-cat-svg[data-mode="focus"] .right-eye .eye-pupil {
+  transform: none;
+}
+
+.auth-cat-svg[data-mode="password"] .eye-white {
+  fill: rgba(38, 26, 20, 0.95);
+  stroke: rgba(38, 26, 20, 0.9);
+}
+
+.auth-cat-svg[data-mode="password"] .eye-pupil {
+  opacity: 1;
+}
+
+.cat-nose-svg {
+  fill: none;
+  stroke: #ef6a2f;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.cat-mouth-svg {
+  fill: none;
+  stroke: rgba(92, 59, 38, 0.75);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.cat-whisker {
+  fill: none;
+  stroke: rgba(92, 59, 38, 0.7);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+.cat-belly-svg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.45);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.policy-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.78);
+  padding: 24px;
+}
+
+.policy-modal {
+  width: min(560px, 100%);
+  padding: 32px 28px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: rgba(13, 19, 32, 0.96);
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.5);
+}
+
+.policy-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  background: rgba(124, 58, 237, 0.18);
+  font-size: 2rem;
+}
+
+.policy-modal h2 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  letter-spacing: -0.06em;
+}
+
+.policy-modal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.policy-modal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0 20px;
+}
+
+.policy-modal-links a {
+  color: #c4b5fd;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.policy-check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  color: white;
+  font-weight: 600;
+}
+
+.policy-check-row input {
+  margin-top: 4px;
+  transform: scale(1.15);
+}
+
+.policy-modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.policy-modal-actions button {
+  flex: 1;
+  min-width: 150px;
+}
+
+.policy-page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 72px 24px 80px;
+}
+
+.policy-page h1 {
+  margin-bottom: 18px;
+  font-size: clamp(2.1rem, 4vw, 3.1rem);
+  letter-spacing: -0.06em;
+}
+
+.policy-page h2 {
+  margin: 26px 0 12px;
+  font-size: clamp(1.2rem, 2vw, 1.8rem);
+}
+
+.policy-page p {
+  color: var(--muted);
+  line-height: 1.8;
+}
+
 .auth-form-panel h2 {
   margin: 0 0 14px;
   font-size: clamp(1.8rem, 3vw, 2.6rem);
@@ -1989,6 +2200,12 @@ main {
   background: rgba(255, 255, 255, 0.02);
   color: white;
   outline: none;
+  color-scheme: dark;
+}
+
+.auth-form select option {
+  background: #0b1220;
+  color: #f8fafc;
 }
 
 .auth-form input:focus,
