@@ -89,10 +89,8 @@ function PolicyAgreementGate() {
 function App() {
   return (
     <div className="app-container">
-      {" "}
-      {/* تم تعديل الكلاس ليتوافق مع الـ CSS الشامل */}
+      <PolicyAgreementGate />
       <Navbar />
-      {/* غلاف الـ main يضمن أن المحتوى يأخذ المساحة المتبقية ويدفع الفوتر للأسفل */}
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Homepage />} />
