@@ -25,6 +25,7 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PolicyAgreementModal from "./components/PolicyAgreementModal";
 import PaymentCallback from "./pages/PaymentCallback";
+import PaymentDetailsPage from "./pages/PaymentDetailsPage";
 import { useAuth } from "./context/AuthContext";
 import { useSettings } from "./context/SettingsContext";
 
@@ -171,6 +172,14 @@ function App() {
             element={
               <SellerRoute>
                 <EditService />
+              </SellerRoute>
+            }
+          />
+          <Route
+            path="/payment-details"
+            element={
+              <SellerRoute>
+                <PaymentDetailsPage />
               </SellerRoute>
             }
           />

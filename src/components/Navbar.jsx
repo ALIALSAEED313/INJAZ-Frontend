@@ -280,7 +280,10 @@ function Navbar() {
               </Link>
 
               {user.isSeller && (
-                <Link to="/services/create">{t("createService")}</Link>
+                <>
+                  <Link to="/services/create">{t("createService")}</Link>
+                  <Link to="/payment-details">Payment Details</Link>
+                </>
               )}
 
               {/* Notifications Dropdown */}
