@@ -24,6 +24,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PolicyAgreementModal from "./components/PolicyAgreementModal";
+import PaymentCallback from "./pages/PaymentCallback";
 import { useAuth } from "./context/AuthContext";
 import { useSettings } from "./context/SettingsContext";
 
@@ -187,6 +188,7 @@ function App() {
               </AdminProtectedRoute>
             }
           />
+          <Route path="/payment/callback" element={<PaymentCallback />} />
         </Routes>
       </main>
       <Footer />
