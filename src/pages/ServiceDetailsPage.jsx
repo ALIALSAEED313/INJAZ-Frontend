@@ -101,7 +101,9 @@ function ServiceDetailsPage() {
     try {
       setOrdering(true);
       setError("");
+
       const token = localStorage.getItem("token");
+
       if (!token) {
         navigate("/sign-in");
         return;
@@ -112,19 +114,23 @@ function ServiceDetailsPage() {
       }
 
       const serviceId = service._id;
+
       const sellerId =
         typeof service.freelancer === "object"
           ? service.freelancer?._id
           : service.freelancer;
+
       const price = service.price;
 
       if (!sellerId) {
         throw new Error("Unable to find the seller for this service.");
       }
+
       if (price === undefined || price === null) {
         throw new Error("Unable to find the price for this service.");
       }
 
+      // 1. Create order
       const response = await fetch("http://localhost:3000/orders", {
         method: "POST",
         headers: {
@@ -139,15 +145,50 @@ function ServiceDetailsPage() {
       });
 
       const data = await response.json().catch(() => null);
+
       if (!response.ok) {
         throw new Error(
           data?.err || data?.error || data?.message || "Failed to create order",
         );
       }
 
-      navigate(`/workspace/${id}`);
+      // Depending on what your backend returns
+      const orderId = data?._id || data?.order?._id;
+
+      if (!orderId) {
+        throw new Error("Order created, but order ID was not returned.");
+      }
+
+      // 2. Create Tap payment
+      const paymentResponse = await fetch(
+        `http://localhost:3000/payments/${orderId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const paymentData = await paymentResponse.json().catch(() => null);
+
+      if (!paymentResponse.ok) {
+        throw new Error(
+          paymentData?.error?.message ||
+            paymentData?.message ||
+            "Failed to create payment",
+        );
+      }
+
+      // 3. Redirect user to Tap
+      if (!paymentData?.paymentUrl) {
+        throw new Error("Tap payment URL was not returned.");
+      }
+
+      window.location.href = paymentData.paymentUrl;
     } catch (err) {
-      console.error("Order creation error:", err);
+      console.error("Order/payment error:", err);
       setError(err.message || "Failed to create order");
     } finally {
       setOrdering(false);
