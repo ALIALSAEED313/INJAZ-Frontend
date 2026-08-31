@@ -202,6 +202,20 @@ function Navbar() {
             >
               <span>{theme === "dark" ? "☀️" : "🌙"}</span>
             </button>
+
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+              aria-label={
+                language === "ar" ? t("switchToEnglish") : t("switchToArabic")
+              }
+              title={
+                language === "ar" ? t("switchToEnglish") : t("switchToArabic")
+              }
+            >
+              <span>{language === "en" ? "AR" : "EN"}</span>
+            </button>
           </div>
 
           {user?.role === "admin" && <Link to="/admin">Admin</Link>}
