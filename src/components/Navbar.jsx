@@ -169,14 +169,18 @@ function Navbar() {
           padding: "10px 20px",
         }}
       >
+<<<<<<< HEAD
         <Link
           to="/"
           className="navbar-brand"
           style={{ textDecoration: "none" }}
         >
+=======
+        <Link to="/" className="navbar-brand" style={{ textDecoration: "none" }}>
+>>>>>>> 2542f149a4486b29c94b020f577c07771074a573
           <div className="Injaz-brand">
             <img
-              src="src/assets/INJAZ-LOGO-tran.svg"
+              src="src/assets/image.svg"
               className="injaz-logo"
               alt="Injaz Logo"
               style={{ height: "70px", width: "auto" }}
@@ -195,13 +199,12 @@ function Navbar() {
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
               aria-label={t("switchToDarkMode")}
               title={
-                theme === "dark"
-                  ? t("switchToLightMode")
-                  : t("switchToDarkMode")
+                theme === "dark" ? t("switchToLightMode") : t("switchToDarkMode")
               }
             >
               <span>{theme === "dark" ? "☀️" : "🌙"}</span>
             </button>
+<<<<<<< HEAD
 
             <button
               type="button"
@@ -211,12 +214,18 @@ function Navbar() {
               {language === "en" ? "AR" : "EN"}
             </button>
           </div>
+=======
+          </div>
+
+          {user?.role === "admin" && <Link to="/admin">Admin</Link>}
+>>>>>>> 2542f149a4486b29c94b020f577c07771074a573
 
           {user ? (
             <>
               {user?.role === "admin" && <Link to="/admin">Admin</Link>}
               <Link to="/dashboard">{t("dashboard")}</Link>
 
+              {/* Chat Dropdown */}
               <div ref={chatDropdownRef} className="notification-wrap">
                 <button
                   type="button"
@@ -269,11 +278,16 @@ function Navbar() {
               <Link to="/chat" className="nav-chat-link">
                 {t("chat")}
               </Link>
+<<<<<<< HEAD
 
+=======
+              
+>>>>>>> 2542f149a4486b29c94b020f577c07771074a573
               {user.isSeller && (
                 <Link to="/services/create">{t("createService")}</Link>
               )}
 
+              {/* Notifications Dropdown */}
               <div ref={dropdownRef} className="notification-wrap">
                 <button
                   type="button"
@@ -381,9 +395,13 @@ function Navbar() {
                 )}
               </div>
 
+<<<<<<< HEAD
               <Link to="/my-profile" className="profile-avatar-link">
+=======
+              <Link to={`/my-profile`} className="profile-avatar-link">
+>>>>>>> 2542f149a4486b29c94b020f577c07771074a573
                 <img
-                  src={user?.avatarUrl}
+                  src={user?.avatarUrl || "https://via.placeholder.com/40"}
                   alt="Profile"
                   style={{
                     width: "40px",
@@ -395,6 +413,7 @@ function Navbar() {
                   }}
                 />
               </Link>
+<<<<<<< HEAD
 
               <button
                 type="button"
@@ -406,6 +425,8 @@ function Navbar() {
               >
                 {t("signOut")}
               </button>
+=======
+>>>>>>> 2542f149a4486b29c94b020f577c07771074a573
             </>
           ) : (
             <>

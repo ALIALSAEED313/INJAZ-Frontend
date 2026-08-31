@@ -214,7 +214,7 @@ function EditService() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50"
+              className="btn btn-primary"
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
