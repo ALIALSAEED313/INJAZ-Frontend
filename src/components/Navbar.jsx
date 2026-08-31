@@ -13,6 +13,11 @@ function Navbar() {
   const { logout, user } = useAuth();
   const { theme, setTheme, language, setLanguage, t } = useSettings();
   const navigate = useNavigate();
+
+  function handleSignOut() {
+    logout();
+    navigate("/");
+  }
   const [unreadNotifications, setUnreadNotifications] = useState([]);
   const [readNotifications, setReadNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -405,6 +410,10 @@ function Navbar() {
                   }}
                 />
               </Link>
+
+              <button type="button" className="auth-link-button" onClick={handleSignOut}>
+                Sign out
+              </button>
             </>
           ) : (
             <>

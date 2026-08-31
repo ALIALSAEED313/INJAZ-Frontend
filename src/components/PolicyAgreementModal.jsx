@@ -5,7 +5,6 @@ import { useSettings } from "../context/SettingsContext";
 function PolicyAgreementModal({ open, onAgree, onRemindLater }) {
   const { language } = useSettings();
   const [checked, setChecked] = useState(false);
-  const isArabic = language === "ar";
 
   useEffect(() => {
     if (open) {
@@ -19,23 +18,17 @@ function PolicyAgreementModal({ open, onAgree, onRemindLater }) {
     <div className="policy-modal-backdrop" role="dialog" aria-modal="true">
       <div className="policy-modal">
         <div className="policy-modal-icon">⚖️</div>
-        <h2>
-          {isArabic
-            ? "الموافقة على السياسات والقواعد"
-            : "Agree to the rules & policy"}
-        </h2>
+        <h2>Agree to the rules & policy</h2>
         <p>
-          {isArabic
-            ? "قبل المتابعة، يرجى قراءة الشروط وسياسة الخصوصية والقبول بالالتزام بها."
-            : "Before continuing, please review our terms and privacy policy and agree to follow them."}
+          Before continuing, please review our terms and privacy policy and agree to follow them.
         </p>
 
         <div className="policy-modal-links">
           <Link to="/terms" onClick={(event) => event.stopPropagation()}>
-            {isArabic ? "الشروط والأحكام" : "Terms & Conditions"}
+            Terms & Conditions
           </Link>
           <Link to="/privacy" onClick={(event) => event.stopPropagation()}>
-            {isArabic ? "سياسة الخصوصية" : "Privacy Policy"}
+            Privacy Policy
           </Link>
         </div>
 
@@ -46,9 +39,7 @@ function PolicyAgreementModal({ open, onAgree, onRemindLater }) {
             onChange={(event) => setChecked(event.target.checked)}
           />
           <span>
-            {isArabic
-              ? "أوافق على الشروط والسياسة وألتزم بها."
-              : "I agree to the terms and policy and will comply with them."}
+            I agree to the terms and policy and will comply with them.
           </span>
         </label>
 
@@ -59,14 +50,14 @@ function PolicyAgreementModal({ open, onAgree, onRemindLater }) {
             onClick={onAgree}
             disabled={!checked}
           >
-            {isArabic ? "أوافق" : "I Agree"}
+            I Agree
           </button>
           <button
             type="button"
             className="secondary-btn"
             onClick={onRemindLater}
           >
-            {isArabic ? "ذكرني لاحقاً" : "Remind me later"}
+            Remind me later
           </button>
         </div>
       </div>
