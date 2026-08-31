@@ -223,8 +223,6 @@ function Navbar() {
             </button>
           </div>
 
-          {user?.role === "admin" && <Link to="/admin">Admin</Link>}
-
           {user ? (
             <>
               {user?.role === "admin" && <Link to="/admin">Admin</Link>}
@@ -285,10 +283,7 @@ function Navbar() {
               </Link>
 
               {user.isSeller && (
-                <>
-                  <Link to="/services/create">{t("createService")}</Link>
-                  <Link to="/payment-details">Payment Details</Link>
-                </>
+                <Link to="/services/create">{t("createService")}</Link>
               )}
 
               {/* Notifications Dropdown */}
