@@ -226,15 +226,18 @@ function EditProfileForm({ profile, onClose, onUpdated }) {
                 value={formData.country}
                 onChange={handleChange}
                 placeholder="Type your country"
+                autoComplete="off" 
               />
 
-              {filteredCountryOptions.length > 0 && (
+              {filteredCountryOptions.length > 0 && formData.country !== filteredCountryOptions[0] && (
                 <ul className="suggestion-list">
                   {filteredCountryOptions.slice(0, 6).map((country) => (
                     <li key={country}>
                       <button
                         type="button"
-                        onClick={() => setFormData({ ...formData, country })}
+                        onMouseDown={() => {
+                          setFormData({ ...formData, country });
+                        }}
                       >
                         {country}
                       </button>
@@ -242,7 +245,7 @@ function EditProfileForm({ profile, onClose, onUpdated }) {
                   ))}
                 </ul>
               )}
-            </div>
+            </div> 
 
             <label htmlFor="gender">Gender</label>
             <select
