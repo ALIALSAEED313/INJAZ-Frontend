@@ -93,9 +93,16 @@ function UserDashboard() {
               {t("welcomeBackUser")}, {user?.username || "Creator"}
             </h1>
           </div>
-          <Link to="/services" className="primary-btn dashboard-link-btn">
-            {t("exploreServices")}
-          </Link>
+          <div className="dashboard-header-actions">
+            {user?.isSeller && (
+              <Link to="/payment-details" className="secondary-btn dashboard-link-btn">
+                Payment Details
+              </Link>
+            )}
+            <Link to="/services" className="primary-btn dashboard-link-btn">
+              {t("exploreServices")}
+            </Link>
+          </div>
         </header>
 
         {user?.isSeller && pendingOrdersForSeller.length > 0 && (

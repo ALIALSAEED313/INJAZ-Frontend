@@ -113,6 +113,13 @@ function MyProfilePage() {
                   </strong>
                 </li>
               </ul>
+              {profile.isSeller && (
+                <div className="my-profile-side-actions">
+                  <a href="/payment-details" className="primary-btn full-width-link">
+                    Payment Details
+                  </a>
+                </div>
+              )}
             </div>
           </aside>
         </div>
