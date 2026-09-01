@@ -29,15 +29,14 @@ import PaymentDetailsPage from "./pages/PaymentDetailsPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import { useAuth } from "./context/AuthContext";
-import { useSettings } from "./context/SettingsContext";
 
 function PolicyAgreementGate() {
   const { user } = useAuth();
-  const { language } = useSettings();
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(false);
       return;
     }
@@ -57,7 +56,7 @@ function PolicyAgreementGate() {
     const reminderDue =
       !lastReminder || Date.now() - lastReminder >= 24 * 60 * 60 * 1000;
     setIsOpen(reminderDue);
-  }, [user, language]);
+  }, [user]);
 
   function savePolicyState(accepted) {
     const policyKey = "injaz-policy-agreement";
