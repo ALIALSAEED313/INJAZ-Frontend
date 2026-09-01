@@ -5,8 +5,6 @@ function CatMascot({ mode = "idle" }) {
         className={`auth-cat-svg ${mode}`}
         data-mode={mode}
         viewBox="0 0 240 180"
-        role="img"
-        aria-label="Cat mascot"
       >
         <ellipse cx="120" cy="160" rx="62" ry="16" className="cat-shadow-svg" />
 

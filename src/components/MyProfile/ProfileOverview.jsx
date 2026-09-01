@@ -1,98 +1,78 @@
-function ProfileOverview({ profile, onEdit }) {
-  const normalizeList = (value) => {
+import { useTranslation } from "react-i18next";
+function ProfileOverview({
+  profile,
+  onEdit
+}) {
+  const {
+    t
+  } = useTranslation();
+  const normalizeList = value => {
     if (Array.isArray(value)) return value.filter(Boolean);
-
     if (typeof value === "string") {
       const trimmed = value.trim();
       if (!trimmed) return [];
-
       try {
         const parsed = JSON.parse(trimmed);
         if (Array.isArray(parsed)) return parsed.filter(Boolean);
-      } catch (err) {
+      } catch {
         // ignore invalid JSON and continue with a split fallback
       }
-
-      return trimmed
-        .replace(/^\[|\]$/g, "")
-        .split(",")
-        .map((item) => item.replace(/["'\[\]]/g, "").trim())
-        .filter(Boolean);
+      return trimmed.replace(/^\[|\]$/g, "").split(",").map(item => item.replace(/["'[\]]/g, "").trim()).filter(Boolean);
     }
-
     return [];
   };
-
   const languages = normalizeList(profile.languages);
   const skills = normalizeList(profile.skills);
-
-  return (
-    <section className="my-profile-card">
+  return <section className="my-profile-card">
       <div className="my-profile-section-header">
         <div>
-          <p className="my-profile-section-kicker">Overview</p>
-          <h2>Professional profile</h2>
+          <p className="my-profile-section-kicker">{t("profileOverview.overview")}</p>
+          <h2>{t("profileOverview.professionalProfile")}</h2>
         </div>
-        <button
-          type="button"
-          className="my-profile-secondary-btn"
-          onClick={onEdit}
-        >
-          Edit overview
-        </button>
+        <button type="button" className="my-profile-secondary-btn" onClick={onEdit}>{t("profileOverview.editOverview")}</button>
       </div>
 
       <div className="my-profile-overview-grid">
         <div className="my-profile-info-box">
-          <h3>About me</h3>
-          <p>{profile.bio || "Tell your clients what makes you stand out."}</p>
+          <h3>{t("profileOverview.aboutMe")}</h3>
+          <p>{profile.bio || t("profileOverview.tellYourClientsWhatMakesYouStandOut")}</p>
         </div>
 
         <div className="my-profile-info-box">
-          <h3>Role</h3>
-          <p>{profile.isSeller ? "Freelancer / Seller" : "Client"}</p>
+          <h3>{t("profileOverview.role")}</h3>
+          <p>{profile.isSeller ? t("profileOverview.freelancerSeller") : t("profileOverview.client")}</p>
         </div>
 
         <div className="my-profile-info-box">
-          <h3>Country</h3>
-          <p>{profile.country || "Not set yet"}</p>
+          <h3>{t("profileOverview.country")}</h3>
+          <p>{profile.country || t("profileOverview.notSetYet")}</p>
         </div>
 
         <div className="my-profile-info-box">
-          <h3>Availability</h3>
+          <h3>{t("profileOverview.availability")}</h3>
           <p>
-            {profile.isSeller ? "Open for freelance work" : "Available to hire"}
+            {profile.isSeller ? t("profileOverview.openForFreelanceWork") : t("profileOverview.availableToHire")}
           </p>
         </div>
       </div>
 
-      {languages.length > 0 && (
-        <div className="my-profile-tag-block">
-          <h3>Languages</h3>
+      {languages.length > 0 && <div className="my-profile-tag-block">
+          <h3>{t("profileOverview.languages")}</h3>
           <div className="my-profile-tag-row">
-            {languages.map((language) => (
-              <span className="my-profile-tag" key={language}>
+            {languages.map(language => <span className="my-profile-tag" key={language}>
                 {language}
-              </span>
-            ))}
+              </span>)}
           </div>
-        </div>
-      )}
+        </div>}
 
-      {skills.length > 0 && (
-        <div className="my-profile-tag-block">
-          <h3>Skills</h3>
+      {skills.length > 0 && <div className="my-profile-tag-block">
+          <h3>{t("profileOverview.skills")}</h3>
           <div className="my-profile-tag-row">
-            {skills.map((skill) => (
-              <span className="my-profile-tag accent" key={skill}>
+            {skills.map(skill => <span className="my-profile-tag accent" key={skill}>
                 {skill}
-              </span>
-            ))}
+              </span>)}
           </div>
-        </div>
-      )}
-    </section>
-  );
+        </div>}
+    </section>;
 }
-
 export default ProfileOverview;

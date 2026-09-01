@@ -1,271 +1,148 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { useSettings } from "../context/SettingsContext";
-
+import { useTranslation } from "react-i18next";
 function ServicesPage() {
-  const { user } = useAuth();
-  const { t, language } = useSettings();
+  const {
+    user
+  } = useAuth();
+  const {
+    t
+  } = useTranslation();
   const [searchParams] = useSearchParams();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
+  const [sortBy, setSortBy] = useState("recommended");
   const category = searchParams.get("category");
-
-  const categoryTranslations = {
-    "web development": language === "ar" ? "تطوير الويب" : "Web Development",
-    "mobile app development":
-      language === "ar" ? "تطوير التطبيقات" : "Mobile App Development",
-    "software development":
-      language === "ar" ? "تطوير البرمجيات" : "Software Development",
-    "graphic design":
-      language === "ar" ? "التصميم الجرافيكي" : "Graphic Design",
-    "ui/ux design":
-      language === "ar" ? "تصميم واجهات المستخدم" : "UI/UX Design",
-    "video & animation":
-      language === "ar" ? "الفيديو والرسوم المتحركة" : "Video & Animation",
-    photography: language === "ar" ? "التصوير" : "Photography",
-    "writing & translation":
-      language === "ar" ? "الكتابة والترجمة" : "Writing & Translation",
-    "digital marketing":
-      language === "ar" ? "التسويق الرقمي" : "Digital Marketing",
-    "social media management":
-      language === "ar" ? "إدارة وسائل التواصل" : "Social Media Management",
-    seo: language === "ar" ? "تحسين محركات البحث" : "SEO",
-    "business & consulting":
-      language === "ar" ? "الأعمال والاستشارات" : "Business & Consulting",
-    "data science & ai":
-      language === "ar"
-        ? "علوم البيانات والذكاء الاصطناعي"
-        : "Data Science & AI",
-    "music & audio": language === "ar" ? "الموسيقى والصوت" : "Music & Audio",
-    "accounting & finance":
-      language === "ar" ? "المحاسبة والمالية" : "Accounting & Finance",
-  };
-
-  const translateServiceText = (value) => {
-    if (language !== "ar" || !value) return value;
-
-    const replacements = {
-      web: "ويب",
-      website: "موقع",
-      app: "تطبيق",
-      mobile: "موبايل",
-      development: "تطوير",
-      design: "تصميم",
-      marketing: "تسويق",
-      video: "فيديو",
-      animation: "رسوم متحركة",
-      photography: "تصوير",
-      business: "أعمال",
-      consulting: "استشارات",
-      seo: "تحسين محركات البحث",
-      writing: "كتابة",
-      translation: "ترجمة",
-      social: "اجتماعي",
-      media: "وسائط",
-      finance: "مالية",
-      accounting: "محاسبة",
-      music: "موسيقى",
-      audio: "صوت",
-      data: "بيانات",
-      science: "علوم",
-      ai: "ذكاء اصطناعي",
-      service: "خدمة",
-      freelancer: "مستقل",
-      seller: "بائع",
-      project: "مشروع",
-      order: "طلب",
-      delivery: "تسليم",
-      days: "أيام",
-      from: "من",
-      ready: "جاهز",
-      secure: "آمن",
-      professional: "مهني",
-      quality: "جودة",
-      communication: "تواصل",
-      using: "استخدام",
-    };
-
-    let translated = String(value);
-    Object.entries(replacements).forEach(([key, valueAr]) => {
-      const regex = new RegExp(key, "gi");
-      translated = translated.replace(regex, valueAr);
+  const visibleServices = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const matches = services.filter(service => !normalized || `${service.title || ""} ${service.description || ""} ${service.category || ""} ${service.freelancer?.username || ""}`.toLowerCase().includes(normalized));
+    return [...matches].sort((a, b) => {
+      if (sortBy === "price-low") return Number(a.price || 0) - Number(b.price || 0);
+      if (sortBy === "price-high") return Number(b.price || 0) - Number(a.price || 0);
+      if (sortBy === "newest") return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+      return 0;
     });
-
-    return translated;
+  }, [query, services, sortBy]);
+  const categoryTranslations = {
+    "web development": t("services.webDevelopment"),
+    "mobile app development": t("services.mobileAppDevelopment"),
+    "software development": t("services.softwareDevelopment"),
+    "graphic design": t("services.graphicDesign"),
+    "ui/ux design": t("services.uIUXDesign"),
+    "video & animation": t("services.videoAnimation"),
+    photography: t("services.photography"),
+    "writing & translation": t("services.writingTranslation"),
+    "digital marketing": t("services.digitalMarketing"),
+    "social media management": t("services.socialMediaManagement"),
+    seo: t("services.sEO"),
+    "business & consulting": t("services.businessConsulting"),
+    "data science & ai": t("services.dataScienceAI"),
+    "music & audio": t("services.musicAudio"),
+    "accounting & finance": t("services.accountingFinance")
   };
-
+  const categoryName = category ? categoryTranslations[category.toLowerCase()] || category : "";
+  const heroTitle = category ? t("services.categoryTitle", {
+    category: categoryName
+  }) : t("services.allServices");
+  const heroDescription = category ? t("services.categoryDescription", {
+    category: categoryName
+  }) : t("services.findTheRightFreelancerForYourProject");
   useEffect(() => {
     async function loadServices() {
       try {
         setLoading(true);
         setError("");
-        const url = category
-          ? `/services?category=${encodeURIComponent(category)}`
-          : "/services";
+        const url = category ? `/services?category=${encodeURIComponent(category)}` : "/services";
         const response = await api.get(url);
         setServices(response.data.services || []);
       } catch (err) {
         console.log(err);
-        setError("Failed to load services");
+        setError(t("services.loadFailed"));
         setServices([]);
       } finally {
         setLoading(false);
       }
     }
-
     loadServices();
-  }, [category]);
-
+  }, [category, t]);
   if (loading) {
-    return (
-      <main className="services-page">
+    return <main className="services-page">
         <section className="services-hero">
           <div className="services-hero-copy">
             <span className="section-label">
-              {language === "ar" ? "السوق" : "Marketplace"}
+              {t("services.marketplace")}
             </span>
-            <h1>
-              {category
-                ? language === "ar"
-                  ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
-                  : `${category} Services`
-                : language === "ar"
-                  ? "جميع الخدمات"
-                  : "All Services"}
-            </h1>
-            <p>
-              {category
-                ? language === "ar"
-                  ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
-                  : `Find the best ${category} services for your project.`
-                : language === "ar"
-                  ? "اعثر على المستقل المناسب لمشروعك."
-                  : "Find the right freelancer for your project."}
-            </p>
+            <h1>{heroTitle}</h1>
+            <p>{heroDescription}</p>
           </div>
         </section>
         <div className="empty-state services-empty-state">
-          <span>⏳</span>
-          <h3>{t("searching")}</h3>
+          <h3>{t("common.searching")}</h3>
         </div>
-      </main>
-    );
+      </main>;
   }
-
   if (error) {
-    return (
-      <main className="services-page">
+    return <main className="services-page">
         <section className="services-hero">
           <div className="services-hero-copy">
             <span className="section-label">
-              {language === "ar" ? "السوق" : "Marketplace"}
+              {t("services.marketplace")}
             </span>
-            <h1>
-              {category
-                ? language === "ar"
-                  ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
-                  : `${category} Services`
-                : language === "ar"
-                  ? "جميع الخدمات"
-                  : "All Services"}
-            </h1>
-            <p>
-              {category
-                ? language === "ar"
-                  ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
-                  : `Find the best ${category} services for your project.`
-                : language === "ar"
-                  ? "اعثر على المستقل المناسب لمشروعك."
-                  : "Find the right freelancer for your project."}
-            </p>
+            <h1>{heroTitle}</h1>
+            <p>{heroDescription}</p>
           </div>
         </section>
         <div className="empty-state services-empty-state">
-          <span>⚠️</span>
           <h3>{error}</h3>
         </div>
-      </main>
-    );
+      </main>;
   }
-
-  return (
-    <main className="services-page">
+  return <main className="services-page">
       <section className="services-hero">
         <div className="services-hero-copy">
           <span className="section-label">
-            {language === "ar" ? "السوق" : "Marketplace"}
+            {t("services.marketplace")}
           </span>
-          <h1>
-            {category
-              ? language === "ar"
-                ? `${categoryTranslations[category.toLowerCase()] || category} خدمات`
-                : `${category} Services`
-              : language === "ar"
-                ? "جميع الخدمات"
-                : "All Services"}
-          </h1>
-          <p>
-            {category
-              ? language === "ar"
-                ? `اعثر على أفضل خدمات ${categoryTranslations[category.toLowerCase()] || category} لمشروعك.`
-                : `Find the best ${category} services for your project.`
-              : language === "ar"
-                ? "اعثر على المستقل المناسب لمشروعك."
-                : "Find the right freelancer for your project."}
-          </p>
+          <h1>{heroTitle}</h1>
+          <p>{heroDescription}</p>
         </div>
 
-        {user?.isSeller && (
-          <Link to="/services/create" className="btn-create-service">
-            {t("createService")}
-          </Link>
-        )}
+        {user?.isSeller && <Link to="/services/create" className="btn-create-service">
+            {t("common.createService")}
+          </Link>}
       </section>
 
-      {services.length === 0 ? (
-        <section className="services-empty-state empty-state">
-          <span>🔎</span>
-          <h3>{t("noServicesFound")}</h3>
+      <section className="marketplace-controls" aria-label={t("services.serviceDiscoveryControls")}>
+        <label className="marketplace-search"><span>{t("common.search")}</span><input type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder={t("common.searchPlaceholder")} /></label>
+        <label><span>{t("services.sortBy")}</span><select value={sortBy} onChange={event => setSortBy(event.target.value)}><option value="recommended">{t("services.recommended")}</option><option value="newest">{t("services.newest")}</option><option value="price-low">{t("services.priceLowToHigh")}</option><option value="price-high">{t("services.priceHighToLow")}</option></select></label>
+      </section>
+      <div className="marketplace-results-row"><p>{t("services.resultCount", {
+          count: visibleServices.length
+        })}</p>{query && <button type="button" onClick={() => setQuery("")}>{t("common.clear")}</button>}</div>
+
+      {visibleServices.length === 0 ? <section className="services-empty-state empty-state">
+          <h3>{t("common.noServicesFound")}</h3>
           <p>
-            {category
-              ? language === "ar"
-                ? `لا توجد خدمات ${category} متاحة حاليًا.`
-                : `There are currently no ${category} services available.`
-              : language === "ar"
-                ? "لا توجد خدمات متاحة حاليًا."
-                : "There are currently no services available."}
+            {category ? t("services.noCategoryServices", {
+          category: categoryName
+        }) : t("services.thereAreCurrentlyNoServicesAvailable")}
           </p>
-          {category && <Link to="/services">{t("viewAll")}</Link>}
-        </section>
-      ) : (
-        <section className="services-grid-wrap">
+          {category && <Link to="/services">{t("common.viewAll")}</Link>}
+        </section> : <section className="services-grid-wrap">
           <div className="services-list-grid">
-            {services.map((service) => (
-              <article key={service._id} className="service-tile">
-                {service.images && service.images.length > 0 ? (
-                  <img
-                    src={service.images[0]}
-                    alt={service.title}
-                    className="service-tile-image"
-                  />
-                ) : (
-                  <div className="service-tile-image placeholder-image">💼</div>
-                )}
+            {visibleServices.map(service => <article key={service._id} className="service-tile">
+                {service.images && service.images.length > 0 ? <img src={service.images[0]} alt={service.title} className="service-tile-image" /> : <div className="service-tile-image placeholder-image">{t("services.injaz")}</div>}
 
                 <div className="service-tile-content">
                   <p className="service-tile-meta">
-                    {service.category} {language === "ar" ? "بواسطة:" : "By:"}{" "}
-                    <Link
-                      to={`/profile/${service.freelancer?._id}`}
-                      className="service-tile-profile-link"
-                    >
-                      {service.freelancer?.username ||
-                        (language === "ar"
-                          ? "مستقل غير معروف"
-                          : "Unknown Freelancer")}
+                    {service.category} {t("services.by")}{" "}
+                    <Link to={`/profile/${service.freelancer?._id}`} className="service-tile-profile-link">
+
+                      {service.freelancer?.username || t("services.unknownFreelancer")}
                     </Link>
                   </p>
 
@@ -276,33 +153,28 @@ function ServicesPage() {
                   </p>
                 </div>
 
-                {/* قسم السعر ومدة التسليم */}
                 <div className="card-footer">
                   <div className="service-tile-price-row">
-                    <span>{t("startingAt")}</span>
-                    <strong>{service.price} BHD</strong>
+                    <span>{t("common.startingAt")}</span>
+                    <strong>{service.price}{t("services.bhd")}</strong>
                   </div>
 
                   <p className="service-tile-delivery">
-                    {language === "ar" ? "التسليم" : "Delivery"}:{" "}
+                    {t("services.delivery")}:{" "}
                     {service.deliveryTime}{" "}
-                    {language === "ar" ? "أيام" : t("days")}
+                    {t("common.days", {
+                count: service.deliveryTime
+              })}
                   </p>
 
-                  <Link
-                    to={`/services/${service._id}`}
-                    className="service-tile-link"
-                  >
-                    {t("viewService")}
+                  <Link to={`/services/${service._id}`} className="service-tile-link">
+
+                    {t("common.viewService")}
                   </Link>
                 </div>
-              </article>
-            ))}
+              </article>)}
           </div>
-        </section>
-      )}
-    </main>
-  );
+        </section>}
+    </main>;
 }
-
 export default ServicesPage;

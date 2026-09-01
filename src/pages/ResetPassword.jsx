@@ -1,106 +1,79 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { useParams, useNavigate, Link } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import api from "../services/api";
-
 function ResetPassword() {
-  const { token } = useParams();
+  const {
+    t
+  } = useTranslation();
+  const {
+    token
+  } = useParams();
   const navigate = useNavigate();
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    
     if (newPassword !== confirmPassword) {
-      setStatus({ type: "error", text: "Passwords do not match!" });
+      setStatus({
+        type: "error",
+        text: t("resetPassword.passwordsDoNotMatch")
+      });
       return;
     }
-
     if (newPassword.length < 6) {
-      setStatus({ type: "error", text: "Password must be at least 6 characters long." });
+      setStatus({
+        type: "error",
+        text: t("resetPassword.passwordTooShort")
+      });
       return;
     }
-
     setLoading(true);
     setStatus("");
-
     try {
-      const response = await api.post(`/auth/reset-password/${token}`, { newPassword });
-      setStatus({ type: "success", text: response.data.message });
-      
-      // توجيه المستخدم لصفحة تسجيل الدخول بعد 3 ثوانٍ
+      const response = await api.post(`/auth/reset-password/${token}`, {
+        newPassword
+      });
+      setStatus({
+        type: "success",
+        text: response.data.message
+      });
       setTimeout(() => {
         navigate("/");
-        // يمكنك فتح نافذة الـ AuthModal هنا إذا أردت
       }, 3000);
-      
     } catch (err) {
       setStatus({
         type: "error",
-        text: err.response?.data?.message || "Invalid or expired token.",
+        text: err.response?.data?.message || "Invalid or expired token."
       });
     } finally {
       setLoading(false);
     }
   };
+  return <main className="form-container auth-recovery-page">
+      <h1 className="page-title">{t("resetPassword.createNewPassword")}</h1>
 
-  return (
-    <div className="form-container" style={{ marginTop: "60px" }}>
-      <h1 className="page-title" style={{ textAlign: "center" }}>Create New Password</h1>
-
-      {status && (
-        <div
-          style={{
-            padding: "10px",
-            marginBottom: "20px",
-            borderRadius: "4px",
-            backgroundColor: status.type === "success" ? "#d4edda" : "#f8d7da",
-            color: status.type === "success" ? "#155724" : "#721c24",
-            textAlign: "center",
-          }}
-        >
+      {status && <div className={`form-status ${status.type}`} role="status">
           {status.text}
-        </div>
-      )}
+        </div>}
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="newPassword">New Password</label>
-          <input
-            type="password"
-            id="newPassword"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            placeholder="Enter new password"
-          />
+          <label htmlFor="newPassword">{t("resetPassword.newPassword")}</label>
+          <input type="password" id="newPassword" value={newPassword} onChange={e => setNewPassword(e.target.value)} required placeholder={t("resetPassword.enterNewPassword")} />
         </div>
 
         <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            placeholder="Confirm new password"
-          />
+          <label htmlFor="confirmPassword">{t("resetPassword.confirmPassword")}</label>
+          <input type="password" id="confirmPassword" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required placeholder={t("resetPassword.confirmNewPassword")} />
         </div>
 
-        <button
-          type="submit"
-          className="btn btn-primary"
-          style={{ width: "100%" }}
-          disabled={loading || status.type === "success"}
-        >
-          {loading ? "Resetting..." : "Reset Password"}
+        <button type="submit" className="btn btn-primary full-width-control" disabled={loading || status.type === "success"}>
+          {loading ? t("resetPassword.resetting") : t("resetPassword.resetPassword")}
         </button>
       </form>
-    </div>
-  );
+    </main>;
 }
-
 export default ResetPassword;
