@@ -1159,7 +1159,16 @@
     "loading": "Loading...",
     "newOrderRequestS": "new order request(s)",
     "waitingForYourActionInTheWorkspace": "waiting for your action in the workspace.",
-    "dayDelivery": "day delivery)"
+    "dayDelivery": "day delivery)",
+    "myPurchases": "My Purchases",
+    "myPurchasesSubtitle": "Services you ordered from freelancers.",
+    "ordersReceived": "Orders Received",
+    "ordersReceivedSubtitle": "Orders clients placed for your services.",
+    "noPurchases": "You haven't placed any orders yet.",
+    "noOrdersReceived": "No orders received yet.",
+    "unknownUser": "Unknown user",
+    "orderCount_one": "{{count}} order",
+    "orderCount_other": "{{count}} orders"
   },
   "paymentCallback": {
     "checkingPayment.": "Checking payment...",

@@ -2610,6 +2610,70 @@ main {
   background: rgba(255, 255, 255, 0.02);
 }
 
+.dashboard-order-sections {
+  display: grid;
+  gap: clamp(24px, 4vw, 36px);
+}
+
+.dashboard-orders-panel {
+  overflow: hidden;
+}
+
+.dashboard-order-heading,
+.dashboard-order-title-row {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-order-heading {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.dashboard-order-title-row {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dashboard-order-title-row h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw, 2.2rem);
+  letter-spacing: -0.05em;
+}
+
+.dashboard-order-heading p {
+  margin: 8px 0 0;
+  color: var(--text-muted);
+}
+
+.dashboard-order-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding-inline: 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: var(--chip-bg);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dashboard-order-empty {
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+}
+
+.dashboard-order-empty p {
+  margin: 0;
+}
+
+.dashboard-empty-action {
+  min-height: 44px;
+}
+
 .section-header-row h2 {
   margin: 0;
   font-size: clamp(1.5rem, 2vw, 2.2rem);
@@ -5847,7 +5911,11 @@ tr:last-child td { border-block-end: 0; }
   .orders-table thead { display: none; }
   .orders-table, .orders-table tbody, .orders-table tr, .orders-table td { display: block; width: 100%; }
   .orders-table tr { margin-block-end: 14px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-strong); }
-  .orders-table td { padding: 7px 4px; border: 0; }
+  .orders-table td { display: grid; grid-template-columns: minmax(92px, 0.42fr) minmax(0, 1fr); align-items: center; gap: 12px; padding: 8px 4px; border: 0; text-align: start; overflow-wrap: anywhere; }
+  .orders-table td::before { content: attr(data-label); color: var(--text-muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+  .orders-table .order-action { padding-block-start: 12px; }
+  .orders-table .workspace-link { display: inline-flex; justify-content: center; min-height: 44px; width: 100%; }
+  .dashboard-order-heading { align-items: flex-start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

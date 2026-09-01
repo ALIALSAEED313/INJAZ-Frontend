@@ -16,7 +16,12 @@ const PaymentCallback = () => {
           setStatus(t("paymentCallback.failed"));
           return;
         }
-        const response = await fetch(`http://localhost:3000/payments/verify?tap_id=${tapId}`);
+        const token = localStorage.getItem("token");
+        const response = await fetch(`http://localhost:3000/payments/verify?tap_id=${encodeURIComponent(tapId)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data?.message || "Failed to verify payment");
