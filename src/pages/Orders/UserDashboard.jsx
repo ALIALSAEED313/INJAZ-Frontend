@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import EditProfileForm from "../../components/MyProfile/EditProfileForm";
+import Icon from "../../components/Icon";
+
+const getEntityId = entity => String(entity?._id || entity || "");
+
 function UserDashboard() {
   const {
     user,
@@ -50,8 +55,66 @@ function UserDashboard() {
       isMounted = false;
     };
   }, [user?.isSeller, t]);
-  const myUserId = user?._id || localStorage.getItem("userId");
-  const pendingOrdersForSeller = orders.filter(o => (o.status === "Requested" || o.status === "Pending") && (o.seller?._id && o.seller._id.toString() === myUserId?.toString() || o.seller && o.seller.toString() === myUserId?.toString()));
+  const currentUserId = String(user?._id || user?.id || localStorage.getItem("userId") || "");
+  const myPurchases = orders.filter(order => getEntityId(order.buyer) === currentUserId);
+  const ordersReceived = orders.filter(order => getEntityId(order.seller) === currentUserId);
+  const pendingOrdersForSeller = ordersReceived.filter(order => order.status === "Requested" || order.status === "Pending");
+
+  const renderOrderSection = ({
+    id,
+    title,
+    subtitle,
+    items,
+    counterpart,
+    emptyMessage,
+    showBrowseAction = false
+  }) => <section className="dashboard-panel dashboard-orders-panel" aria-labelledby={`${id}-title`}>
+      <div className="dashboard-order-heading">
+        <div>
+          <div className="dashboard-order-title-row">
+            <h2 id={`${id}-title`}>{title}</h2>
+            <span className="dashboard-order-count">{t("userDashboard.orderCount", { count: items.length })}</span>
+          </div>
+          <p>{subtitle}</p>
+        </div>
+      </div>
+
+      {items.length === 0 ? <div className="empty-card dashboard-order-empty">
+          <p>{emptyMessage}</p>
+          {showBrowseAction && <Link to="/services" className="secondary-btn dashboard-empty-action">{t("common.browseServices")}</Link>}
+        </div> : <div className="table-container">
+          <table className="orders-table">
+            <thead>
+              <tr>
+                <th>{t("common.orderId")}</th>
+                <th>{t("common.service")}</th>
+                <th>{counterpart === "seller" ? t("common.seller") : t("common.buyer")}</th>
+                <th>{t("common.price")}</th>
+                <th>{t("common.status")}</th>
+                <th>{t("common.action")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map(order => {
+            const isIncomingNewOrder = counterpart === "buyer" && (order.status === "Requested" || order.status === "Pending");
+            const counterpartUser = counterpart === "seller" ? order.seller : order.buyer;
+            const counterpartName = counterpartUser?.username || counterpartUser?.name || counterpartUser?.email || t("userDashboard.unknownUser");
+            return <tr key={order._id} className="order-row">
+                    <td className="order-id" data-label={t("common.orderId")}>
+                      <span dir="ltr">{String(order._id).slice(0, 8)}...</span>
+                      {isIncomingNewOrder && <span className="order-tag">{t("userDashboard.new")}</span>}
+                    </td>
+                    <td className="order-service" data-label={t("common.service")}>{order.service?.title || t("userDashboard.unknownService")}</td>
+                    <td className="order-counterpart" data-label={counterpart === "seller" ? t("common.seller") : t("common.buyer")}>{counterpartName}</td>
+                    <td className="order-price" data-label={t("common.price")}><span dir="ltr">{order.price} {t("userDashboard.bhd")}</span></td>
+                    <td className="order-status-cell" data-label={t("common.status")}><span className="order-status">{order.status}</span></td>
+                    <td className="order-action" data-label={t("common.action")}><Link to={`/workspace/${order._id}`} className="workspace-link">{t("common.workspace")}</Link></td>
+                  </tr>;
+          })}
+            </tbody>
+          </table>
+        </div>}
+    </section>;
   if (loading) return <div className="loading-state">{t("userDashboard.loading")}</div>;
   if (error) return <div className="error-state">{error}</div>;
   return <main className="dashboard-page">
@@ -77,7 +140,7 @@ function UserDashboard() {
         </header>
 
         {user?.isSeller && pendingOrdersForSeller.length > 0 && <div className="alert-banner">
-            <span>🔔</span>
+            <Icon name="bell" size={20} />
             <span>{t("userDashboard.youHave")}{" "}
               <strong>
                 {pendingOrdersForSeller.length}{t("userDashboard.newOrderRequestS")}</strong>{" "}{t("userDashboard.waitingForYourActionInTheWorkspace")}</span>
@@ -102,50 +165,25 @@ function UserDashboard() {
           </div>
         </section>
 
-        <section className="dashboard-panel">
-          <div className="section-header-row">
-            <h2>{t("common.myOrders")}</h2>
-          </div>
-
-          {orders.length === 0 ? <div className="empty-card">
-              <p>{t("common.noOrders")}</p>
-            </div> : <div className="table-container">
-              <table className="orders-table">
-                <thead>
-                  <tr>
-                    <th>{t("common.orderId")}</th>
-                    <th>{t("common.service")}</th>
-                    <th>{t("common.price")}</th>
-                    <th>{t("common.status")}</th>
-                    <th>{t("common.action")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orders.map(order => {
-                const isPendingSellerOrder = (order.status === "Requested" || order.status === "Pending") && (order.seller?._id && order.seller._id.toString() === myUserId?.toString() || order.seller && order.seller.toString() === myUserId?.toString());
-                return <tr key={order._id} className="order-row">
-                        <td className="order-id">
-                          {order._id.substring(0, 8)}...
-                          {isPendingSellerOrder && <span className="order-tag">{t("userDashboard.new")}</span>}
-                        </td>
-                        <td className="order-service">
-                          {order.service?.title || t("userDashboard.unknownService")}
-                        </td>
-                        <td className="order-price">{order.price}{t("userDashboard.bhd")}</td>
-                        <td className="order-status-cell">
-                          <span className="order-status">{order.status}</span>
-                        </td>
-                        <td className="order-action">
-                          <Link to={`/workspace/${order._id}`} className="workspace-link">
-                            {t("common.workspace")} {isPendingSellerOrder && "🔔"}
-                          </Link>
-                        </td>
-                      </tr>;
-              })}
-                </tbody>
-              </table>
-            </div>}
-        </section>
+        <div className="dashboard-order-sections">
+          {renderOrderSection({
+          id: "my-purchases",
+          title: t("userDashboard.myPurchases"),
+          subtitle: t("userDashboard.myPurchasesSubtitle"),
+          items: myPurchases,
+          counterpart: "seller",
+          emptyMessage: t("userDashboard.noPurchases"),
+          showBrowseAction: true
+        })}
+          {renderOrderSection({
+          id: "orders-received",
+          title: t("userDashboard.ordersReceived"),
+          subtitle: t("userDashboard.ordersReceivedSubtitle"),
+          items: ordersReceived,
+          counterpart: "buyer",
+          emptyMessage: t("userDashboard.noOrdersReceived")
+        })}
+        </div>
 
         {user?.isSeller && <section className="dashboard-panel my-services-section">
             <div className="section-header-row">
@@ -178,4 +216,3 @@ function UserDashboard() {
     </main>;
 }
 export default UserDashboard;
-import { useTranslation } from "react-i18next";

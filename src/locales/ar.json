@@ -1163,7 +1163,20 @@
     "loading": "جارٍ التحميل...",
     "newOrderRequestS": "طلب جديد",
     "waitingForYourActionInTheWorkspace": "بانتظار إجراء منك في مساحة العمل.",
-    "dayDelivery": "يوم للتسليم)"
+    "dayDelivery": "يوم للتسليم)",
+    "myPurchases": "مشترياتي",
+    "myPurchasesSubtitle": "الخدمات التي طلبتها من المستقلين.",
+    "ordersReceived": "الطلبات المستلمة",
+    "ordersReceivedSubtitle": "الطلبات التي قدمها العملاء لخدماتك.",
+    "noPurchases": "لم تقدم أي طلبات بعد.",
+    "noOrdersReceived": "لا توجد طلبات مستلمة بعد.",
+    "unknownUser": "مستخدم غير معروف",
+    "orderCount_zero": "لا توجد طلبات",
+    "orderCount_one": "طلب واحد",
+    "orderCount_two": "طلبان",
+    "orderCount_few": "{{count}} طلبات",
+    "orderCount_many": "{{count}} طلبًا",
+    "orderCount_other": "{{count}} طلب"
   },
   "paymentCallback": {
     "checkingPayment.": "جارٍ التحقق من الدفع...",
