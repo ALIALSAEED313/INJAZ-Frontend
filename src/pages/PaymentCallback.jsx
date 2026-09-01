@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import PageLoader from "../components/loading-ui/Loading";
 const PaymentCallback = () => {
   const {
     t
@@ -47,9 +48,7 @@ const PaymentCallback = () => {
     verifyPayment();
   }, [searchParams, navigate, t]);
   if (status === "loading") {
-    return <div>
-        <h2>{t("paymentCallback.checkingPayment")}</h2>
-      </div>;
+    return <PageLoader message={t("paymentCallback.checkingPayment")} />;
   }
   if (status === "success") {
     return <div>

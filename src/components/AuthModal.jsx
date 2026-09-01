@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
+import MorphingInfinity from "./loading-ui/morphing-infinity";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { signIn, signUp } from "../services/authService";
@@ -262,8 +263,7 @@ function AuthModal({
                 {success && <div className="form-alert form-alert-success">{success}</div>}
 
                 <button type="submit" className="primary-cta" disabled={loading}>
-
-                  {loading ? t("authModal.signingIn") : t("authModal.signIn")}
+                  {loading ? <MorphingInfinity className="size-20" /> : t("authModal.signIn")}
                 </button>
 
                 <p className="auth-switch-copy">
@@ -345,8 +345,7 @@ function AuthModal({
                 {success && <div className="form-alert form-alert-success">{success}</div>}
 
                 <button type="submit" className="primary-cta" disabled={loading}>
-
-                  {loading ? t("authModal.creatingAccount") : t("authModal.createAccount")}
+                  {loading ? <MorphingInfinity className="size-20" /> : t("authModal.createAccount")}
                 </button>
 
                 <p className="auth-switch-copy">

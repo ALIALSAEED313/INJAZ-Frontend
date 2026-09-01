@@ -6,6 +6,7 @@ import { getProfile } from "../../services/profile.Service";
 import { getReviewsForFreelancer } from "../../services/review.Service";
 import ProfileServices from "../../components/Profile/ProfileServices";
 import ProfileReviews from "../../components/Profile/ProfileReviews";
+import PageLoader from "../../components/loading-ui/Loading";
 function ProfilePage() {
   const {
     t
@@ -147,13 +148,7 @@ function ProfilePage() {
     value: profile?.onTimeDelivery || "98%"
   }];
   if (loading) {
-    return <main className="profile-page-shell">
-        <div className="profile-loading-shell">
-          <div className="profile-loading-card hero" />
-          <div className="profile-loading-card" />
-          <div className="profile-loading-card" />
-        </div>
-      </main>;
+    return <PageLoader message={t("profile.loadingProfile")} />;
   }
   if (error) {
     return <main className="profile-page-shell">

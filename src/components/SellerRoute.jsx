@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import PageLoader from "./loading-ui/Loading";
 const SellerRoute = ({
   children
 }) => {
@@ -12,7 +13,7 @@ const SellerRoute = ({
     user
   } = useAuth();
   if (loading) {
-    return <p>{t("sellerRoute.loading")}</p>;
+    return <PageLoader message={t("sellerRoute.loading")} />;
   }
 
   // 1. If the user is not logged in at all, send to sign-in

@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { searchServices } from "../services/serviceService";
 import api from "../services/api";
 import Icon from "../components/Icon";
+import MorphingInfinity from "../components/loading-ui/morphing-infinity";
 function Homepage() {
   const {
     t
@@ -175,7 +176,7 @@ function Homepage() {
             <input type="text" placeholder={t("common.searchPlaceholder")} value={search} onChange={event => setSearch(event.target.value)} dir="auto" />
 
             <button type="submit" disabled={loading}>
-              {loading ? t("common.searching") : t("common.search")}
+              {loading ? <MorphingInfinity className="size-20" /> : t("common.search")}
             </button>
           </form>
           {error && <p className="error">{error}</p>}
@@ -202,7 +203,7 @@ function Homepage() {
               {t("common.clear")}
             </button>
           </div>
-          {loading ? <div className="loading">{t("common.searching")}</div> : services.length === 0 ? <div className="empty-state">
+          {loading ? <div className="loading"><MorphingInfinity className="size-24" /> <span>{t("common.searching")}</span></div> : services.length === 0 ? <div className="empty-state">
               <Icon name="search" size={28} />
               <h3>{t("common.noServicesFound")}</h3>
               <p>{t("common.tryAnotherSearch")}</p>

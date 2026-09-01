@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
 import axios from 'axios';
+import PageLoader, { ButtonLoader } from "../../components/loading-ui/Loading";
 const Checkout = () => {
   const {
     t
@@ -54,7 +55,7 @@ const Checkout = () => {
       setIsProcessing(false);
     }
   };
-  if (loading) return <div className="loading-state">{t("checkout.loadingCheckout")}</div>;
+  if (loading) return <PageLoader message={t("checkout.loadingCheckout")} />;
   if (error) return <div className="error-state">{error}</div>;
   if (invoice) {
     return <div className="invoice-container">
@@ -93,7 +94,7 @@ const Checkout = () => {
         <p className="payment-note">{t("checkout.forThisMvpClickConfirmToDeductFromYourVirtualBalance")}</p>
 
         <button className="btn-checkout" onClick={handleCheckout} disabled={isProcessing}>
-          {isProcessing ? t("checkout.processing") : t("checkout.confirmAndPay")}
+          {isProcessing ? <ButtonLoader /> : t("checkout.confirmAndPay")}
         </button>
       </div>
     </div>;

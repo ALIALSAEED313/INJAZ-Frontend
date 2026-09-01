@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import { createReview, getReviewByOrder, updateReview, deleteReview } from "../../services/review.Service";
 import axios from "axios";
 import RatingStars from "../../components/RatingStars";
+import PageLoader from "../../components/loading-ui/Loading";
 function OrderWorkspace() {
   const {
     orderId
@@ -189,7 +190,7 @@ function OrderWorkspace() {
   const myUserId = localStorage.getItem("userId");
   const sellerId = order?.seller?._id || order?.seller;
   const isSellerUser = Boolean(sellerId && myUserId && sellerId.toString() === myUserId.toString());
-  if (loading) return <div className="workspace-loading">{t("orderWorkspace.loadingWorkspace")}</div>;
+  if (loading) return <PageLoader message={t("orderWorkspace.loadingWorkspace")} />;
   if (error) return <div className="workspace-error">{error}</div>;
   return <main className="workspace-page">
       <div className="workspace-shell">

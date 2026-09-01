@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getAdminStats, getUsers, getServices, getOrders, getReviews, updateUserRole, deleteUser, deleteService, deleteOrder, deleteReview } from "../../services/admin.Service";
 import { useAuth } from "../../context/AuthContext";
 import AdminOverview from "../../components/Admin/AdminOverview";
+import PageLoader from "../../components/loading-ui/Loading";
 import AdminUsers from "../../components/Admin/AdminUsers";
 import AdminServices from "../../components/Admin/AdminServices";
 import AdminOrders from "../../components/Admin/AdminOrders";
@@ -192,7 +193,7 @@ function AdminDashboard() {
     const matchesRating = reviewRatingFilter === "all" || review.rating === Number(reviewRatingFilter);
     return matchesSearch && matchesRating;
   });
-  if (loading) return <p>{t("adminDashboard.loadingAdminDashboard")}</p>;
+  if (loading) return <PageLoader message={t("adminDashboard.loadingAdminDashboard")} />;
   if (error) return <p>{error}</p>;
   return <main className="admin-page">
       <header className="admin-header"><div><span className="section-label">{t("adminDashboard.injazOperations")}</span><h1>{t("adminDashboard.adminDashboard")}</h1><p>{t("adminDashboard.manageMarketplaceActivityFromOneClearWorkspace")}</p></div></header>

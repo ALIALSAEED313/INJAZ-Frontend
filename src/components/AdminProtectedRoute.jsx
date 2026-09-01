@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Navigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
+import PageLoader from "./loading-ui/Loading";
 function AdminProtectedRoute({
   children
 }) {
@@ -11,7 +12,7 @@ function AdminProtectedRoute({
     loading,
     user
   } = useAuth();
-  if (loading) return <p>{t("adminProtectedRoute.loading")}</p>;
+  if (loading) return <PageLoader message={t("adminProtectedRoute.loading")} />;
   if (!user) {
     return <Navigate to="/sign-in" />;
   }

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { getServicesByFreelancer } from "../../services/profile.Service";
+import PageLoader from "../loading-ui/Loading";
 function ProfileServices({
   id
 }) {
@@ -28,7 +29,7 @@ function ProfileServices({
     fetchProfileServices();
   }, [id]);
   if (loading) {
-    return <div className="profile-section-loading">{t("profileServices.loadingServices")}</div>;
+    return <PageLoader message={t("profileServices.loadingServices")} />;
   }
   if (error) {
     return <div className="profile-section-empty">{t("profileServices.unableToLoadServicesRightNow")}</div>;

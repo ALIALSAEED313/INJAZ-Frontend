@@ -5,6 +5,7 @@ import axios from "axios";
 import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useSettings } from "../context/SettingsContext";
 import Icon from "../components/Icon";
+import PageLoader from "../components/loading-ui/Loading";
 function mergeMessagesById(currentMessages, incomingMessages) {
   const messagesById = new Map();
   [...currentMessages, ...incomingMessages].forEach(message => {
@@ -377,7 +378,7 @@ function ChatPage() {
     return haystack.includes(conversationSearch.trim().toLowerCase());
   });
   if (loading) {
-    return <div className="workspace-loading">{t("common.loadingChats")}</div>;
+    return <PageLoader message={t("common.loadingChats")} />;
   }
   return <main className="chat-list-page">
       <div className={`chat-list-shell ${selectedConversation ? "has-active-chat" : ""}`}>

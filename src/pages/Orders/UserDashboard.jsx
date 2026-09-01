@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import EditProfileForm from "../../components/MyProfile/EditProfileForm";
+import PageLoader from "../../components/loading-ui/Loading";
 import Icon from "../../components/Icon";
 
 const getEntityId = entity => String(entity?._id || entity || "");
@@ -115,7 +116,7 @@ function UserDashboard() {
           </table>
         </div>}
     </section>;
-  if (loading) return <div className="loading-state">{t("userDashboard.loading")}</div>;
+  if (loading) return <PageLoader message={t("userDashboard.loading")} />;
   if (error) return <div className="error-state">{error}</div>;
   return <main className="dashboard-page">
       {showProfileSetupModal && user && <EditProfileForm profile={user} onClose={() => setShowProfileSetupModal(false)} onUpdated={updatedProfile => {

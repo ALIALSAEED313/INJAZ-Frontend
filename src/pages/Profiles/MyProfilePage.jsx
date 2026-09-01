@@ -8,6 +8,7 @@ import ProfileOverview from "../../components/MyProfile/ProfileOverview";
 import EditOverviewForm from "../../components/MyProfile/EditOverviewForm";
 import "../../components/MyProfile/myProfile.css";
 import ProfileServices from "../../components/Profile/ProfileServices";
+import PageLoader from "../../components/loading-ui/Loading";
 function MyProfilePage() {
   const {
     t
@@ -39,7 +40,7 @@ function MyProfilePage() {
     fetchMyProfile();
   }, []);
   if (loading) {
-    return <p>{t("myProfile.loading")}</p>;
+    return <PageLoader message={t("myProfile.loading")} />;
   }
   if (error) {
     return <p>{t("myProfile.failedToLoadProfile")}</p>;

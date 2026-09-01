@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import PageLoader from "../../components/loading-ui/Loading";
 function OrderChatPage() {
   const {
     orderId
@@ -145,7 +146,7 @@ function OrderChatPage() {
     if (!file) return;
     setAttachment(file);
   }
-  if (loading) return <div className="workspace-loading">{t("orderChat.loadingChat")}</div>;
+  if (loading) return <PageLoader message={t("orderChat.loadingChat")} />;
   if (error) return <div className="workspace-error">{error}</div>;
   return <main className="workspace-page">
       <div className="workspace-shell chat-page-shell">

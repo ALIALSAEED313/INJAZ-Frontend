@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useState } from "react";
 import { getReviewsForFreelancer } from "../../services/review.Service";
+import PageLoader from "../loading-ui/Loading";
 function ProfileReviews({
   userId
 }) {
@@ -52,7 +53,7 @@ function ProfileReviews({
     });
   }, [reviews, search, sortBy]);
   if (loading) {
-    return <div className="profile-section-loading">{t("profileReviews.loadingReviews")}</div>;
+    return <PageLoader message={t("profileReviews.loadingReviews")} />;
   }
   if (!totalReviews) {
     return <div className="profile-empty-state">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import { getCurrentUser } from "../services/authService";
+import PageLoader from "../components/loading-ui/Loading";
 import { useTranslation } from "react-i18next";
 function ServiceDetailsPage() {
   const {
@@ -163,35 +164,7 @@ function ServiceDetailsPage() {
     }
   }
   if (loading) {
-    return <main className="service-page loading-page">
-        <div className="service-bg" />
-
-        <div className="container loading-shell">
-          <div className="loading-nav">
-            <div className="pulse-dot" />
-            <div className="loading-line short" />
-            <div className="loading-line tiny" />
-          </div>
-
-          <div className="loading-hero">
-            <div className="loading-badge" />
-            <div className="loading-title" />
-            <div className="loading-line" />
-            <div className="loading-line medium" />
-          </div>
-
-          <div className="loading-pills">
-            <div className="loading-pill" />
-            <div className="loading-pill" />
-            <div className="loading-pill" />
-          </div>
-
-          <div className="loading-grid">
-            <div className="loading-card large" />
-            <div className="loading-card" />
-          </div>
-        </div>
-      </main>;
+    return <PageLoader message={t("serviceDetails.loadingService")} />;
   }
   if (error && !service) {
     return <main className="service-page error-page">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import api from "../services/api";
+import PageLoader from "../components/loading-ui/Loading";
 import { useAuth } from "../context/AuthContext";
 import { useTranslation } from "react-i18next";
 function ServicesPage() {
@@ -70,20 +71,7 @@ function ServicesPage() {
     loadServices();
   }, [category, t]);
   if (loading) {
-    return <main className="services-page">
-        <section className="services-hero">
-          <div className="services-hero-copy">
-            <span className="section-label">
-              {t("services.marketplace")}
-            </span>
-            <h1>{heroTitle}</h1>
-            <p>{heroDescription}</p>
-          </div>
-        </section>
-        <div className="empty-state services-empty-state">
-          <h3>{t("common.searching")}</h3>
-        </div>
-      </main>;
+    return <PageLoader message={t("services.loadingServices")} />;
   }
   if (error) {
     return <main className="services-page">

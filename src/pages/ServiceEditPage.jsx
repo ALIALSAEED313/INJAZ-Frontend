@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import axios from "axios";
+import PageLoader, { ButtonLoader } from "../components/loading-ui/Loading";
 function EditService() {
   const {
     t
@@ -85,9 +86,7 @@ function EditService() {
     }
   };
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
-        <p>{t("serviceEdit.loadingService")}</p>
-      </div>;
+    return <PageLoader message={t("serviceEdit.loadingService")} />;
   }
   return <main className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-8">
@@ -138,7 +137,7 @@ function EditService() {
           <div className="flex gap-4 pt-4">
             <button type="button" onClick={() => navigate(`/services/${id}`)} className="flex-1 border border-gray-300 py-3 rounded-lg font-medium hover:bg-gray-100">{t("serviceEdit.cancel")}</button>
             <button type="submit" disabled={saving} className="btn btn-primary">
-              {saving ? t("serviceEdit.saving") : t("serviceEdit.saveChanges")}
+              {saving ? <ButtonLoader /> : t("serviceEdit.saveChanges")}
             </button>
           </div>
         </form>

@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link } from "react-router";
 import api from "../services/api";
+import MorphingInfinity from "../components/loading-ui/morphing-infinity";
 function ForgotPassword() {
   const {
     t
@@ -46,7 +47,7 @@ function ForgotPassword() {
           </div>}
 
         <button type="submit" className="btn btn-primary full-width-control" disabled={loading}>
-          {loading ? t("forgotPassword.sending") : t("forgotPassword.sendResetLink")}
+          {loading ? <MorphingInfinity className="size-20" /> : t("forgotPassword.sendResetLink")}
         </button>
 
         <div className="auth-recovery-back">
