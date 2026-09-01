@@ -12,14 +12,17 @@ function ResetPassword() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (newPassword !== confirmPassword) {
       setStatus({ type: "error", text: "Passwords do not match!" });
       return;
     }
 
     if (newPassword.length < 6) {
-      setStatus({ type: "error", text: "Password must be at least 6 characters long." });
+      setStatus({
+        type: "error",
+        text: "Password must be at least 6 characters long.",
+      });
       return;
     }
 
@@ -27,15 +30,16 @@ function ResetPassword() {
     setStatus("");
 
     try {
-      const response = await api.post(`/auth/reset-password/${token}`, { newPassword });
+      const response = await api.post(`/auth/reset-password/${token}`, {
+        newPassword,
+      });
       setStatus({ type: "success", text: response.data.message });
-      
+
       // توجيه المستخدم لصفحة تسجيل الدخول بعد 3 ثوانٍ
       setTimeout(() => {
         navigate("/");
         // يمكنك فتح نافذة الـ AuthModal هنا إذا أردت
       }, 3000);
-      
     } catch (err) {
       setStatus({
         type: "error",
@@ -48,7 +52,9 @@ function ResetPassword() {
 
   return (
     <div className="form-container" style={{ marginTop: "60px" }}>
-      <h1 className="page-title" style={{ textAlign: "center" }}>Create New Password</h1>
+      <h1 className="page-title" style={{ textAlign: "center" }}>
+        Create New Password
+      </h1>
 
       {status && (
         <div
