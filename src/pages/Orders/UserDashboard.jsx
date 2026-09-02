@@ -8,6 +8,8 @@ import PageLoader from "../../components/loading-ui/Loading";
 import Icon from "../../components/Icon";
 
 const getEntityId = entity => String(entity?._id || entity || "");
+const getValueByPath = (value, path) =>
+  path?.split(".").reduce((current, key) => current?.[key], value);
 
 function UserDashboard() {
   const {
@@ -59,6 +61,12 @@ function UserDashboard() {
   const currentUserId = String(user?._id || user?.id || localStorage.getItem("userId") || "");
   const myPurchases = orders.filter(order => getEntityId(order.buyer) === currentUserId);
   const ordersReceived = orders.filter(order => getEntityId(order.seller) === currentUserId);
+  const activeReceivedOrders = ordersReceived.filter(order =>
+    ["Requested", "Pending", "In Progress"].includes(order.status)
+  );
+  const deliveredReceivedOrders = ordersReceived.filter(order => order.status === "Delivered");
+  const completedReceivedOrders = ordersReceived.filter(order => order.status === "Completed");
+  const cancelledReceivedOrders = ordersReceived.filter(order => order.status === "Cancelled");
   const pendingOrdersForSeller = ordersReceived.filter(order => order.status === "Requested" || order.status === "Pending");
 
   const renderOrderSection = ({
@@ -68,7 +76,9 @@ function UserDashboard() {
     items,
     counterpart,
     emptyMessage,
-    showBrowseAction = false
+    showBrowseAction = false,
+    dateField,
+    dateLabel
   }) => <section className="dashboard-panel dashboard-orders-panel" aria-labelledby={`${id}-title`}>
       <div className="dashboard-order-heading">
         <div>
@@ -91,6 +101,7 @@ function UserDashboard() {
                 <th>{t("common.service")}</th>
                 <th>{counterpart === "seller" ? t("common.seller") : t("common.buyer")}</th>
                 <th>{t("common.price")}</th>
+                {dateField && <th>{dateLabel}</th>}
                 <th>{t("common.status")}</th>
                 <th>{t("common.action")}</th>
               </tr>
@@ -100,6 +111,7 @@ function UserDashboard() {
             const isIncomingNewOrder = counterpart === "buyer" && (order.status === "Requested" || order.status === "Pending");
             const counterpartUser = counterpart === "seller" ? order.seller : order.buyer;
             const counterpartName = counterpartUser?.username || counterpartUser?.name || counterpartUser?.email || t("userDashboard.unknownUser");
+            const sectionDate = getValueByPath(order, dateField);
             return <tr key={order._id} className="order-row">
                     <td className="order-id" data-label={t("common.orderId")}>
                       <span dir="ltr">{String(order._id).slice(0, 8)}...</span>
@@ -108,6 +120,11 @@ function UserDashboard() {
                     <td className="order-service" data-label={t("common.service")}>{order.service?.title || t("userDashboard.unknownService")}</td>
                     <td className="order-counterpart" data-label={counterpart === "seller" ? t("common.seller") : t("common.buyer")}>{counterpartName}</td>
                     <td className="order-price" data-label={t("common.price")}><span dir="ltr">{order.price} {t("userDashboard.bhd")}</span></td>
+                    {dateField && <td className="order-date" data-label={dateLabel}>
+                        {sectionDate
+                          ? new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(sectionDate))
+                          : "—"}
+                      </td>}
                     <td className="order-status-cell" data-label={t("common.status")}><span className="order-status">{order.status}</span></td>
                     <td className="order-action" data-label={t("common.action")}><Link to={`/workspace/${order._id}`} className="workspace-link">{t("common.workspace")}</Link></td>
                   </tr>;
@@ -176,14 +193,44 @@ function UserDashboard() {
           emptyMessage: t("userDashboard.noPurchases"),
           showBrowseAction: true
         })}
-          {renderOrderSection({
-          id: "orders-received",
-          title: t("userDashboard.ordersReceived"),
-          subtitle: t("userDashboard.ordersReceivedSubtitle"),
-          items: ordersReceived,
-          counterpart: "buyer",
-          emptyMessage: t("userDashboard.noOrdersReceived")
-        })}
+          {user?.isSeller && <>
+              {renderOrderSection({
+              id: "active-orders",
+              title: t("userDashboard.activeOrders", { defaultValue: "Active Orders" }),
+              subtitle: t("userDashboard.activeOrdersSubtitle", { defaultValue: "Orders that need your attention or are currently in progress." }),
+              items: activeReceivedOrders,
+              counterpart: "buyer",
+              emptyMessage: t("userDashboard.noActiveOrders", { defaultValue: "No active orders right now." })
+            })}
+              {renderOrderSection({
+              id: "delivered-orders",
+              title: t("userDashboard.deliveredOrders", { defaultValue: "Delivered Orders" }),
+              subtitle: t("userDashboard.deliveredOrdersSubtitle", { defaultValue: "Completed deliveries sent to buyers." }),
+              items: deliveredReceivedOrders,
+              counterpart: "buyer",
+              emptyMessage: t("userDashboard.noDeliveredOrders", { defaultValue: "No delivered orders yet." }),
+              dateField: "delivery.deliveredAt",
+              dateLabel: t("userDashboard.deliveredDate", { defaultValue: "Delivered date" })
+            })}
+              {renderOrderSection({
+              id: "completed-orders",
+              title: t("userDashboard.completedOrders", { defaultValue: "Completed Orders" }),
+              subtitle: t("userDashboard.completedOrdersSubtitle", { defaultValue: "Deliveries accepted by buyers." }),
+              items: completedReceivedOrders,
+              counterpart: "buyer",
+              emptyMessage: t("userDashboard.noCompletedOrders", { defaultValue: "No completed orders yet." }),
+              dateField: "completedAt",
+              dateLabel: t("userDashboard.completedDate", { defaultValue: "Completed date" })
+            })}
+              {cancelledReceivedOrders.length > 0 && renderOrderSection({
+              id: "cancelled-orders",
+              title: t("userDashboard.cancelledOrders", { defaultValue: "Cancelled Orders" }),
+              subtitle: t("userDashboard.cancelledOrdersSubtitle", { defaultValue: "Orders that were cancelled before completion." }),
+              items: cancelledReceivedOrders,
+              counterpart: "buyer",
+              emptyMessage: ""
+            })}
+            </>}
         </div>
 
         {user?.isSeller && <section className="dashboard-panel my-services-section">

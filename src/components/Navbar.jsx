@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { useSettings } from "../context/SettingsContext";
 import AuthModal from "./AuthModal";
@@ -21,7 +22,12 @@ function Navbar() {
   } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const navClass = path => location.pathname === path || path !== "/" && location.pathname.startsWith(path) ? "nav-active" : "";
+  const isActivePath = path => {
+    if (path === "/") return location.pathname === "/";
+    if (path === "/services" && location.pathname.startsWith("/services/create")) return false;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+  const navClass = path => isActivePath(path) ? "nav-active" : "";
   function handleSignOut() {
     logout();
     navigate("/");
@@ -150,7 +156,8 @@ function Navbar() {
     navigate(`/chat/${conversation._id}`);
   }
   return <>
-      <nav className="navbar" aria-label={t("navbar.primaryNavigation")}>
+      <nav className="navbar marketplace-navbar" aria-label={t("navbar.primaryNavigation")}>
+        <div className="navbar-inner">
         <Link to="/" className="navbar-brand" onClick={() => setMenuOpen(false)}>
 
           <div className="Injaz-brand">
@@ -166,63 +173,36 @@ function Navbar() {
         <div id="primary-menu" className={`navbar-links ${menuOpen ? "mobile-open" : ""}`} onClick={event => {
         if (event.target.closest("a")) setMenuOpen(false);
       }}>
-          <Link to="/" className={navClass("/")} aria-current={location.pathname === "/" ? "page" : undefined}>{t("common.home")}</Link>
-          <Link to="/services" className={navClass("/services")} aria-current={location.pathname.startsWith("/services") ? "page" : undefined}>{t("common.services")}</Link>
-
-          <div className="settings-controls">
-            <button type="button" className="theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={t("common.switchToDarkMode")} title={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")}>
-
-              <Icon name={theme === "dark" ? "sun" : "moon"} />
-            </button>
-
-            <div className="language-switcher" aria-label={t("language.selector")}>
-              <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"}>{t("language.english")}</button>
-              <span aria-hidden="true">|</span>
-              <button type="button" onClick={() => setLanguage("ar")} aria-pressed={language === "ar"}>{t("language.arabic")}</button>
-            </div>
+          <div className="nav-primary-group">
+            <Link to="/" className={navClass("/")} aria-current={location.pathname === "/" ? "page" : undefined}>{t("common.home")}</Link>
+            <Link to="/services" className={navClass("/services")} aria-current={isActivePath("/services") ? "page" : undefined}>{t("common.services")}</Link>
           </div>
 
           {user ? <>
+            <div className="nav-work-group">
               {user?.role === "admin" && <Link to="/admin" className={navClass("/admin")}>{t("navbar.admin")}</Link>}
               <Link to="/dashboard" className={navClass("/dashboard")}>{t("common.dashboard")}</Link>
 
-              {/* Chat Dropdown */}
-              <div ref={chatDropdownRef} className="notification-wrap">
-                <button type="button" className="notification-button chat-button" onClick={() => setChatOpen(!chatOpen)} aria-label={t("common.unreadChats")}>
 
-                  <Icon name="message" />
-                  {chatCount > 0 && <span className="notification-badge">{chatCount}</span>}
-                </button>
-
-                {chatOpen && <div className="notification-dropdown">
-                    <div className="notification-header">
-                      <span>{t("common.unreadChats")}</span>
-                    </div>
-
-                    <div className="notification-list">
-                      {chatUnread.length === 0 ? <p className="empty-notification">
-                          {t("common.noUnreadChats")}
-                        </p> : chatUnread.map(chat => <div key={chat._id} className="notification-item unread" onClick={() => handleChatOpen(chat)}>
-
-                            <div className="notification-title">
-                              {chat.participant?.name || chat.participant?.username}
-                            </div>
-                            <div className="notification-message">
-                              {chat.lastMessage?.content || t("common.messages")}
-                            </div>
-                            <div className="notification-time">
-                              {chat.unreadCount} {t("common.unread")}
-                            </div>
-                          </div>)}
-                    </div>
-                  </div>}
-              </div>
 
               <Link to="/chat" className={`nav-chat-link ${navClass("/chat")}`}>
                 {t("common.chat")}
               </Link>
 
-              {user.isSeller && <Link to="/services/create">{t("common.createService")}</Link>}
+              {user.isSeller && <Link to="/services/create" className={`nav-create-cta ${navClass("/services/create")}`} aria-current={isActivePath("/services/create") ? "page" : undefined}>{t("common.createService")}</Link>}
+            </div>
+
+            <div className="nav-utility-group">
+              <div className="settings-controls">
+                <button type="button" className="theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")} title={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")}>
+                  <Icon name={theme === "dark" ? "sun" : "moon"} />
+                </button>
+                <div className="language-switcher" aria-label={t("language.selector")}>
+                  <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"}>EN</button>
+                  <span aria-hidden="true">/</span>
+                  <button type="button" onClick={() => setLanguage("ar")} aria-pressed={language === "ar"}>ع</button>
+                </div>
+              </div>
 
               {/* Notifications Dropdown */}
               <div ref={dropdownRef} className="notification-wrap">
@@ -291,10 +271,23 @@ function Navbar() {
                 <button type="button" className="account-menu-trigger" onClick={() => setAccountOpen(value => !value)} aria-expanded={accountOpen} aria-controls="account-menu" aria-label={t("navbar.accountMenu")}>
                   <img src={user?.avatarUrl || "https://via.placeholder.com/40"} alt="" />
                   <span>{user?.username || t("common.user")}</span>
+                  <Icon name="chevronDown" size={16} />
                 </button>
                 {accountOpen && <div className="account-menu" id="account-menu"><div className="account-menu-identity"><strong dir="auto">{user?.username}</strong><span dir="ltr">{user?.email}</span></div><Link to="/my-profile">{t("common.viewProfile")}</Link>{user?.isSeller && <Link to="/payment-details">{t("navbar.paymentDetails")}</Link>}<button type="button" onClick={handleSignOut}>{t("common.signOut")}</button></div>}
               </div>
+            </div>
             </> : <>
+              <div className="nav-utility-group nav-guest-utilities">
+                <div className="settings-controls">
+                  <button type="button" className="theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")} title={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")}>
+                    <Icon name={theme === "dark" ? "sun" : "moon"} />
+                  </button>
+                  <div className="language-switcher" aria-label={t("language.selector")}>
+                    <button type="button" onClick={() => setLanguage("en")} aria-pressed={language === "en"}>EN</button>
+                    <span aria-hidden="true">/</span>
+                    <button type="button" onClick={() => setLanguage("ar")} aria-pressed={language === "ar"}>ع</button>
+                  </div>
+                </div>
               <button type="button" className="auth-link-button" onClick={() => {
             setAuthMode("sign-up");
             setAuthOpen(true);
@@ -309,7 +302,9 @@ function Navbar() {
 
                 {t("common.signIn")}
               </button>
+              </div>
             </>}
+        </div>
         </div>
       </nav>
       {menuOpen && <button type="button" className="mobile-menu-scrim" onClick={() => setMenuOpen(false)} aria-label={t("navbar.closeMenu")} />}
@@ -319,4 +314,3 @@ function Navbar() {
     </>;
 }
 export default Navbar;
-import { useTranslation } from "react-i18next";

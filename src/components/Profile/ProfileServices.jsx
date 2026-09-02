@@ -60,9 +60,13 @@ function ProfileServices({
             <p>{oneService.description || t("profileServices.noDescriptionProvidedYet")}</p>
 
             <div className="profile-service-meta-row">
-              <span>{oneService.deliveryTime || 3}{t("profileServices.daysDelivery")}</span>
+              <span>{oneService.deliveryTime
+                ? `${oneService.deliveryTime}${t("profileServices.daysDelivery")}`
+                : "—"}</span>
               <span>
-                {oneService.rating ? `${Number(oneService.rating).toFixed(1)} rating` : t("profileServices.newListing")}
+                {oneService.reviewCount
+                  ? `★ ${Number(oneService.averageRating).toFixed(1)} (${oneService.reviewCount})`
+                  : t("profileServices.noReviewsYet", { defaultValue: "No reviews yet" })}
               </span>
             </div>
 

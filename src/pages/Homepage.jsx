@@ -225,8 +225,10 @@ function Homepage() {
                     <h3><Link to={`/services/${service._id}`}>{service.title}</Link></h3>
                     <p>{service.description}</p>
                     <div className="service-rating">
-                      ⭐{" "}
-                      {service.rating || t("homepage.new")}
+                      <Icon name="star" size={17} />{" "}
+                      {service.reviewCount
+                        ? `${Number(service.averageRating).toFixed(1)} (${service.reviewCount})`
+                        : t("services.noReviewsYet", { defaultValue: "No reviews yet" })}
                     </div>
                     <div className="service-footer">
                       <span>{t("common.startingAt")}</span>

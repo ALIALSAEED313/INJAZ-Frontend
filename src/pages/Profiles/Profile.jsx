@@ -133,19 +133,15 @@ function ProfilePage() {
   }
   const stats = [{
     label: "Completed Orders",
-    value: reviews.length || 0
+    value: profile?.sellerStats?.completedOrders || 0
   }, {
     label: "Total Reviews",
-    value: reviews.length || 0
+    value: profile?.sellerStats?.totalReviews || reviews.length || 0
   }, {
     label: "Average Rating",
-    value: reviews.length ? averageRating.toFixed(1) : "0.0"
-  }, {
-    label: "Response Rate",
-    value: profile?.responseRate || "95%"
-  }, {
-    label: "On-Time Delivery",
-    value: profile?.onTimeDelivery || "98%"
+    value: (profile?.sellerStats?.totalReviews || reviews.length)
+      ? Number(profile?.sellerStats?.averageRating || averageRating).toFixed(1)
+      : "—"
   }];
   if (loading) {
     return <PageLoader message={t("profile.loadingProfile")} />;
@@ -181,14 +177,11 @@ function ProfilePage() {
           <div className="profile-hero-copy">
             <div className="profile-badges-row">
               {profile.isSeller && <span className="profile-badge verified">{t("profile.erified")}</span>}
-              <span className="profile-badge top">{t("profile.opRated")}</span>
-              <span className="profile-badge fast">{t("profile.astResponse")}</span>
             </div>
 
             <h1>{profileName}</h1>
             <div className="profile-identity-row">
               <span>@{profile.username}</span>
-              <span className="profile-status-pill">{t("profile.availableNow")}</span>
             </div>
 
             <div className="profile-rating-row">
