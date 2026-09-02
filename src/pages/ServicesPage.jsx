@@ -139,6 +139,12 @@ function ServicesPage() {
                   <p className="service-tile-description">
                     {service.description}
                   </p>
+                  <div className="service-card-rating" aria-label={service.reviewCount ? `${service.averageRating.toFixed(1)} out of 5 from ${service.reviewCount} reviews` : t("services.noReviewsYet", { defaultValue: "No reviews yet" })}>
+                    <span aria-hidden="true">★</span>
+                    {service.reviewCount
+                      ? <strong>{Number(service.averageRating).toFixed(1)} <small>({service.reviewCount})</small></strong>
+                      : <span>{t("services.noReviewsYet", { defaultValue: "No reviews yet" })}</span>}
+                  </div>
                 </div>
 
                 <div className="card-footer">

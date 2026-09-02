@@ -1,258 +1,218 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
-import { getCurrentUser } from "../services/authService";
-import PageLoader from "../components/loading-ui/Loading";
 import { useTranslation } from "react-i18next";
+import { getCurrentUser } from "../services/authService";
+import { getReviewByService } from "../services/review.Service";
+import RatingStars from "../components/RatingStars";
+import Icon from "../components/Icon";
+import PageLoader from "../components/loading-ui/Loading";
+
+const API_URL = "http://localhost:3000";
+
 function ServiceDetailsPage() {
-  const {
-    id
-  } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const [service, setService] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [reviews, setReviews] = useState([]);
+  const [reviewSummary, setReviewSummary] = useState({
+    averageRating: 0,
+    reviewCount: 0,
+    distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+  });
+  const [reviewPage, setReviewPage] = useState(1);
+  const [hasMoreReviews, setHasMoreReviews] = useState(false);
+  const [reviewSort, setReviewSort] = useState("recent");
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [ordering, setOrdering] = useState(false);
+
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: "auto"
-    });
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [id]);
+
   useEffect(() => {
-    async function getService() {
+    let active = true;
+    async function load() {
       try {
         setLoading(true);
-        setError("");
-        const response = await fetch(`http://localhost:3000/services/${id}`);
-        if (!response.ok) {
-          throw new Error("Service not found");
-        }
-        const data = await response.json();
-        setService(data);
-      } catch (err) {
-        console.error("Get service error:", err);
-        setError(t("serviceDetails.failedToLoadService"));
+        const [serviceResponse, reviewData] = await Promise.all([
+          fetch(`${API_URL}/services/${id}`),
+          getReviewByService(id, { page: 1, sort: reviewSort }),
+        ]);
+        if (!serviceResponse.ok) throw new Error("Service not found");
+        const serviceData = await serviceResponse.json();
+        if (!active) return;
+        setService(serviceData);
+        setReviews(reviewData.reviews || []);
+        setReviewSummary(reviewData.summary || {
+          averageRating: 0,
+          reviewCount: 0,
+          distribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
+        });
+        setReviewPage(1);
+        setHasMoreReviews(Boolean(reviewData.pagination?.hasMore));
+      } catch (requestError) {
+        if (active) setError(requestError.message || t("serviceDetails.failedToLoadService"));
       } finally {
-        setLoading(false);
+        if (active) setLoading(false);
       }
     }
-    if (id) {
-      getService();
-    }
-  }, [id, t]);
+    load();
+    return () => {
+      active = false;
+    };
+  }, [id, reviewSort, t]);
+
   useEffect(() => {
-    async function getUser() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setCurrentUser(null);
-        return;
-      }
+    async function loadUser() {
+      if (!localStorage.getItem("token")) return;
       try {
-        const user = await getCurrentUser();
-        setCurrentUser(user);
-      } catch (err) {
-        console.log("User is not logged in", err);
+        setCurrentUser(await getCurrentUser());
+      } catch {
         setCurrentUser(null);
       }
     }
-    getUser();
+    loadUser();
   }, []);
-  async function handleDelete() {
-    const confirmed = window.confirm(t("serviceDetails.areYouSureYouWantToDeleteThisService"));
-    if (!confirmed) return;
+
+  const freelancer = service?.freelancer || {};
+  const freelancerId = String(freelancer?._id || freelancer || "");
+  const currentUserId = String(currentUser?._id || currentUser?.id || "");
+  const isOwner = Boolean(freelancerId && currentUserId && freelancerId === currentUserId);
+  const freelancerName = freelancer?.username || t("serviceDetails.freelancer");
+  const initials = freelancerName.slice(0, 2).toUpperCase();
+  const ratingLabel = reviewSummary.reviewCount
+    ? `${reviewSummary.averageRating.toFixed(1)} (${reviewSummary.reviewCount})`
+    : t("serviceDetails.noReviewsYet", { defaultValue: "No reviews yet" });
+
+  const distributionRows = useMemo(
+    () => [5, 4, 3, 2, 1].map(rating => ({
+      rating,
+      count: Number(reviewSummary.distribution?.[rating] || 0),
+      percent: reviewSummary.reviewCount
+        ? (Number(reviewSummary.distribution?.[rating] || 0) / reviewSummary.reviewCount) * 100
+        : 0,
+    })),
+    [reviewSummary],
+  );
+
+  async function loadMoreReviews() {
+    try {
+      setReviewLoading(true);
+      const nextPage = reviewPage + 1;
+      const data = await getReviewByService(id, { page: nextPage, sort: reviewSort });
+      setReviews(previous => [...previous, ...(data.reviews || [])]);
+      setReviewPage(nextPage);
+      setHasMoreReviews(Boolean(data.pagination?.hasMore));
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || t("serviceDetails.failedToLoadReviews", { defaultValue: "Unable to load more reviews." }));
+    } finally {
+      setReviewLoading(false);
+    }
+  }
+
+  async function deleteService() {
+    if (!window.confirm(t("serviceDetails.areYouSureYouWantToDeleteThisService"))) return;
     try {
       setDeleting(true);
-      setError("");
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/sign-in");
-        return;
-      }
-      const response = await fetch(`http://localhost:3000/services/${id}`, {
+      const response = await fetch(`${API_URL}/services/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      const data = await response.json().catch(() => null);
       if (!response.ok) {
-        throw new Error(data?.message || t("serviceDetails.deleteFailed"));
+        const data = await response.json();
+        throw new Error(data.message);
       }
       navigate("/services");
-    } catch (err) {
-      console.error("Delete error:", err);
-      setError(err.message || t("serviceDetails.deleteFailed"));
+    } catch (requestError) {
+      setError(requestError.message || t("serviceDetails.deleteFailed"));
     } finally {
       setDeleting(false);
     }
   }
-  async function handleOrder() {
+
+  async function orderService() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/sign-in");
+      return;
+    }
     try {
       setOrdering(true);
       setError("");
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/sign-in");
-        return;
-      }
-      if (!service) {
-        throw new Error("Service information is missing.");
-      }
-      const serviceId = service._id;
-      const sellerId = typeof service.freelancer === "object" ? service.freelancer?._id : service.freelancer;
-      const price = service.price;
-      if (!sellerId) {
-        throw new Error("Unable to find the seller for this service.");
-      }
-      if (price === undefined || price === null) {
-        throw new Error("Unable to find the price for this service.");
-      }
-
-      // 1. Create order
-      const response = await fetch("http://localhost:3000/orders", {
+      const orderResponse = await fetch(`${API_URL}/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          serviceId,
-          sellerId,
-          price
-        })
+        body: JSON.stringify({ serviceId: service._id }),
       });
-      const data = await response.json().catch(() => null);
-      if (!response.ok) {
-        throw new Error(data?.err || data?.error || data?.message || t("serviceDetails.orderFailed"));
-      }
+      const orderData = await orderResponse.json();
+      if (!orderResponse.ok) throw new Error(orderData.message || orderData.err);
+      const orderId = orderData.order?._id;
 
-      // Depending on what your backend returns
-      const orderId = data?._id || data?.order?._id;
-      if (!orderId) {
-        throw new Error("Order created, but order ID was not returned.");
-      }
-
-      // 2. Create Tap payment
-      const paymentResponse = await fetch(`http://localhost:3000/payments/${orderId}`, {
+      const paymentResponse = await fetch(`${API_URL}/payments/${orderId}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      const paymentData = await paymentResponse.json().catch(() => null);
-      if (!paymentResponse.ok) {
-        throw new Error(paymentData?.error?.message || paymentData?.message || t("serviceDetails.paymentFailed"));
+      const paymentData = await paymentResponse.json();
+      if (!paymentResponse.ok || !paymentData.paymentUrl) {
+        throw new Error(paymentData.message || t("serviceDetails.paymentFailed"));
       }
-
-      // 3. Redirect user to Tap
-      if (!paymentData?.paymentUrl) {
-        throw new Error("Tap payment URL was not returned.");
-      }
-      window.location.href = paymentData.paymentUrl;
-    } catch (err) {
-      console.error("Order/payment error:", err);
-      setError(err.message || t("serviceDetails.orderFailed"));
-    } finally {
+      window.location.assign(paymentData.paymentUrl);
+    } catch (requestError) {
+      setError(requestError.message || t("serviceDetails.orderFailed"));
       setOrdering(false);
     }
   }
-  if (loading) {
-    return <PageLoader message={t("serviceDetails.loadingService")} />;
-  }
+
+  if (loading) return <PageLoader message={t("serviceDetails.loadingService")} />;
   if (error && !service) {
-    return <main className="service-page error-page">
-        <div className="service-bg" />
-
-        <div className="error-panel">
-          <div className="error-icon">!</div>
-          <h1>{t("serviceDetails.serviceUnavailable")}</h1>
-          <p>{error}</p>
-          <Link to="/services" className="button-primary error-button">{t("serviceDetails.exploreServices")}<span>→</span>
-          </Link>
-        </div>
-      </main>;
+    return <main className="service-page"><div className="service-error" role="alert">{error}</div></main>;
   }
-  if (!service) return null;
-  const serviceFreelancerId = typeof service.freelancer === "object" ? service.freelancer?._id : service.freelancer;
-  const currentUserId = currentUser?._id || currentUser?.id;
-  const isOwner = currentUserId && serviceFreelancerId && String(currentUserId) === String(serviceFreelancerId);
-  const freelancer = typeof service.freelancer === "object" ? service.freelancer : null;
-  const freelancerName = freelancer?.username || freelancer?.name || freelancer?.fullName || "INJAZ Freelancer";
-  const initials = freelancerName.split(" ").map(word => word[0]).join("").slice(0, 2).toUpperCase();
-  const categoryTranslation = {
-    "web development": t("serviceDetails.webDevelopment"),
-    "mobile app development": t("serviceDetails.mobileAppDevelopment"),
-    "software development": t("serviceDetails.softwareDevelopment"),
-    "graphic design": t("serviceDetails.graphicDesign"),
-    "ui/ux design": t("serviceDetails.uIUXDesign"),
-    "video & animation": t("serviceDetails.videoAnimation"),
-    photography: t("serviceDetails.photography"),
-    "writing & translation": t("serviceDetails.writingTranslation"),
-    "digital marketing": t("serviceDetails.digitalMarketing"),
-    "social media management": t("serviceDetails.socialMediaManagement"),
-    seo: t("serviceDetails.sEO"),
-    "business & consulting": t("serviceDetails.businessConsulting"),
-    "data science & ai": t("serviceDetails.dataScienceAI"),
-    "music & audio": t("serviceDetails.musicAudio"),
-    "accounting & finance": t("serviceDetails.accountingFinance")
-  };
-  const serviceCategoryText = categoryTranslation[service.category?.toLowerCase()] || service.category || t("serviceDetails.service");
-  return <main className="service-page">
+
+  return (
+    <main className="service-page">
       <div className="service-bg" />
-
-      <div className="container service-shell">
-        {error && service && <div className="status-banner">{error}</div>}
-
+      <div className="service-shell">
         <nav className="service-nav">
-          <div className="nav-brand">
-            <span className="nav-dot" />
-            <span>{t("serviceDetails.injaz")}</span>
-          </div>
-
-          <div className="nav-links">
-            <Link to="/services">{t("serviceDetails.services")}</Link>
-            <Link to="/services">{t("serviceDetails.explore")}</Link>
-          </div>
-
-          <Link to="/services" className="nav-back">
-            <span>←</span>
-            {t("serviceDetails.back")}
-          </Link>
+          <Link to="/services" className="nav-back">← {t("serviceDetails.back")}</Link>
+          <span className="nav-brand"><span className="nav-dot" />{t("serviceDetails.injaz")}</span>
         </nav>
 
-        {service.images?.length > 0 && <section className="hero-gallery">
+        {error && <div className="service-error" role="alert">{error}</div>}
+
+        {service.images?.length > 0 && (
+          <section className="hero-gallery">
             <div className="hero-gallery-main">
               <img src={service.images[0]} alt={service.title} />
             </div>
-            {service.images.length > 1 && <div className="hero-gallery-thumbs">
-                {service.images.slice(1, 4).map((image, index) => <img key={`${image}-${index}`} src={image} alt={`${service.title} ${index + 2}`} />)}
-              </div>}
-          </section>}
+            {service.images.length > 1 && (
+              <div className="hero-gallery-thumbs">
+                {service.images.slice(1, 4).map((image, index) => (
+                  <img key={image} src={image} alt={`${service.title} ${index + 2}`} />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="hero-block">
           <div className="hero-content">
-            <span className="hero-badge">{serviceCategoryText}</span>
+            <span className="hero-badge">{service.category}</span>
             <h1>{service.title}</h1>
             <p>{service.description}</p>
-
             <div className="meta-row">
-              <span className="meta-pill">★ 5.0</span>
-              <span className="meta-pill">
-                ⚡ {service.deliveryTime} {t("serviceDetails.days")}
+              <span className="meta-pill service-rating-pill">
+                <Icon name="star" size={17} />
+                {ratingLabel}
               </span>
-              <span className="meta-pill">
-                ✓ {t("serviceDetails.professional")}
-              </span>
-              <span className="meta-pill">
-                ● {t("serviceDetails.available")}
-              </span>
+              <span className="meta-pill">{service.deliveryTime} {t("serviceDetails.days")}</span>
             </div>
           </div>
         </section>
@@ -260,212 +220,143 @@ function ServiceDetailsPage() {
         <div className="content-grid">
           <div className="content-column">
             <section className="panel intro-panel">
-              <div className="panel-head">
-                <span className="panel-index">01</span>
-                <div className="panel-line" />
-                <span className="panel-label">
-                  {t("serviceDetails.theService")}
-                </span>
-              </div>
-              <p>{service.description}</p>
-            </section>
-
-            <section className="panel benefit-panel">
               <div className="section-header">
                 <div>
-                  <p className="eyebrow">
-                    {t("serviceDetails.whatYouGet")}
-                  </p>
-                  <h2>
-                    {t("serviceDetails.aCompleteCreativeWorkflow")}
-                  </h2>
+                  <p className="eyebrow">{t("serviceDetails.theService")}</p>
+                  <h2>{t("serviceDetails.whatYouGet")}</h2>
                 </div>
               </div>
-
-              <div className="benefit-grid">
-                <article className="benefit-card benefit-card-lg">
-                  <div className="benefit-top">
-                    <span className="benefit-number">01</span>
-                    <span className="benefit-icon accent">✦</span>
-                  </div>
-                  <h3>{t("serviceDetails.professionalQuality")}</h3>
-                  <p>
-                    {t("serviceDetails.highQualityWorkDesignedToMatchYour")}
-                  </p>
-                </article>
-
-                <article className="benefit-card benefit-card-xl">
-                  <div className="benefit-top">
-                    <span className="benefit-number">02</span>
-                    <span className="benefit-icon sand">⚡</span>
-                  </div>
-                  <h3>{t("serviceDetails.fastDelivery")}</h3>
-                  <p>
-                    {t("serviceDetails.timelyExecutionWithClearMilestonesAndDependable")}
-                  </p>
-                </article>
-
-                <article className="benefit-card benefit-card-xl">
-                  <div className="benefit-top">
-                    <span className="benefit-number">03</span>
-                    <span className="benefit-icon sand">💬</span>
-                  </div>
-                  <h3>{t("serviceDetails.clearCommunication")}</h3>
-                  <p>
-                    {t("serviceDetails.directCollaborationAndStreamlinedUpdatesFromKickoff")}
-                  </p>
-                </article>
-
-                <article className="benefit-card benefit-card-lg">
-                  <div className="benefit-top">
-                    <span className="benefit-number">04</span>
-                    <span className="benefit-icon accent">✓</span>
-                  </div>
-                  <h3>{t("serviceDetails.reliableService")}</h3>
-                  <p>
-                    {t("serviceDetails.consistencyPrecisionAndASmoothExperienceFrom")}
-                  </p>
-                </article>
-              </div>
+              <p>{service.description}</p>
             </section>
 
             <section className="panel freelancer-panel">
               <div className="section-header compact">
                 <div>
-                  <p className="eyebrow">
-                    {t("serviceDetails.freelancer")}
-                  </p>
-                  <h2>
-                    {t("serviceDetails.trustedCreativePartner")}
-                  </h2>
+                  <p className="eyebrow">{t("serviceDetails.freelancer")}</p>
+                  <h2>{freelancerName}</h2>
                 </div>
-                <span className="online-pill">
-                  {t("serviceDetails.online")}
-                </span>
               </div>
-
               <div className="freelancer-card">
                 <div className="avatar-wrap">
-                  {freelancer?.avatarUrl ? <img src={freelancer.avatarUrl} alt={freelancerName} className="avatar-image-render" /> : <div className="avatar-gradient">{initials}</div>}
-                  <span className="avatar-status" />
+                  {freelancer.avatarUrl
+                    ? <img src={freelancer.avatarUrl} alt={freelancerName} className="avatar-image-render" />
+                    : <div className="avatar-gradient">{initials}</div>}
                 </div>
-
                 <div className="freelancer-meta">
-                  <div className="freelancer-identity">
-                    <p>{freelancerName}</p>
-                    <span className="verified-pill">{t("serviceDetails.verified")}</span>
-                  </div>
+                  <strong>{freelancerName}</strong>
                   <span>{t("serviceDetails.injazCreator")}</span>
                 </div>
+                {freelancerId && (
+                  <Link to={`/profile/${freelancerId}`} className="button-secondary profile-button">
+                    {t("serviceDetails.viewSellerProfile")}
+                  </Link>
+                )}
+              </div>
+            </section>
 
-                <div className="freelancer-actions">
-                  {serviceFreelancerId && <Link to={`/profile/${serviceFreelancerId}`} className="button-secondary profile-button">
+            <section className="panel service-reviews-panel" aria-labelledby="service-reviews-title">
+              <div className="section-header review-section-header">
+                <div>
+                  <p className="eyebrow">{t("serviceDetails.clientFeedback", { defaultValue: "Client feedback" })}</p>
+                  <h2 id="service-reviews-title">{t("serviceDetails.reviews", { defaultValue: "Reviews" })}</h2>
+                </div>
+                <label className="review-sort-control">
+                  <span>{t("serviceDetails.sortReviews", { defaultValue: "Sort reviews" })}</span>
+                  <select value={reviewSort} onChange={event => setReviewSort(event.target.value)}>
+                    <option value="recent">{t("serviceDetails.mostRecent", { defaultValue: "Most recent" })}</option>
+                    <option value="highest">{t("serviceDetails.highestRating", { defaultValue: "Highest rating" })}</option>
+                    <option value="lowest">{t("serviceDetails.lowestRating", { defaultValue: "Lowest rating" })}</option>
+                  </select>
+                </label>
+              </div>
 
-                      {t("serviceDetails.viewSellerProfile")}
-                    </Link>}
+              <div className="service-rating-summary">
+                <div className="service-rating-score">
+                  <strong>{reviewSummary.reviewCount ? reviewSummary.averageRating.toFixed(1) : "—"}</strong>
+                  <RatingStars value={reviewSummary.averageRating} readOnly />
+                  <span>{reviewSummary.reviewCount} {t("serviceDetails.reviews", { defaultValue: "reviews" })}</span>
+                </div>
+                <div className="service-rating-distribution">
+                  {distributionRows.map(row => (
+                    <div className="service-rating-bar" key={row.rating}>
+                      <span>{row.rating} ★</span>
+                      <div><i style={{ width: `${row.percent}%` }} /></div>
+                      <small>{row.count}</small>
+                    </div>
+                  ))}
                 </div>
               </div>
+
+              {reviews.length === 0 ? (
+                <div className="service-review-empty">
+                  <Icon name="star" size={24} />
+                  <h3>{t("serviceDetails.noReviewsYet", { defaultValue: "No reviews yet" })}</h3>
+                  <p>{t("serviceDetails.firstReviewMessage", { defaultValue: "Completed-order reviews will appear here." })}</p>
+                </div>
+              ) : (
+                <div className="service-review-list">
+                  {reviews.map(review => {
+                    const name = review.reviewer?.name || review.reviewer?.username || t("serviceDetails.client", { defaultValue: "Client" });
+                    return (
+                      <article className="service-review-item" key={review._id}>
+                        <header>
+                          {review.reviewer?.avatarUrl
+                            ? <img src={review.reviewer.avatarUrl} alt={name} />
+                            : <span className="reviewer-avatar-fallback" aria-hidden="true">{name.charAt(0).toUpperCase()}</span>}
+                          <div>
+                            <strong>{name}</strong>
+                            <RatingStars value={review.rating} readOnly />
+                          </div>
+                          <time dateTime={review.createdAt}>
+                            {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(review.createdAt))}
+                          </time>
+                        </header>
+                        <p>{review.comment || t("serviceDetails.noWrittenComment", { defaultValue: "No written comment." })}</p>
+                      </article>
+                    );
+                  })}
+                  {hasMoreReviews && (
+                    <button type="button" className="secondary-btn load-more-reviews" disabled={reviewLoading} onClick={loadMoreReviews}>
+                      {reviewLoading
+                        ? t("common.loading")
+                        : t("serviceDetails.loadMore", { defaultValue: "Load more reviews" })}
+                    </button>
+                  )}
+                </div>
+              )}
             </section>
           </div>
 
           <aside className="purchase-column">
             <div className="purchase-panel">
-              <div className="purchase-header">
-                <span>{t("serviceDetails.startingFrom")}</span>
-                <span className="ready-tag">{t("serviceDetails.ready")}</span>
-              </div>
-
-              <div className="price-row">
-                <span>{service.price}</span>
-                <small>{t("serviceDetails.bhd")}</small>
-              </div>
-
+              <div className="purchase-header"><span>{t("serviceDetails.startingFrom")}</span></div>
+              <div className="price-row"><span>{service.price}</span><small>{t("serviceDetails.bhd")}</small></div>
               <div className="purchase-details">
-                <div className="detail-row">
-                  <div className="detail-left">
-                    <span className="detail-icon accent">⚡</span>
-                    <span>{t("serviceDetails.delivery")}</span>
-                  </div>
-                  <strong>
-                    {service.deliveryTime} {t("serviceDetails.days2")}
-                  </strong>
-                </div>
-
-                <div className="detail-row">
-                  <div className="detail-left">
-                    <span className="detail-icon gold">★</span>
-                    <span>{t("serviceDetails.rating")}</span>
-                  </div>
-                  <strong>5.0 / 5</strong>
-                </div>
-
-                <div className="detail-row">
-                  <div className="detail-left">
-                    <span className="detail-icon sand">✓</span>
-                    <span>{t("serviceDetails.professional")}</span>
-                  </div>
-                  <strong>{t("serviceDetails.included")}</strong>
-                </div>
+                <div className="detail-row"><span>{t("serviceDetails.delivery")}</span><strong>{service.deliveryTime} {t("serviceDetails.days2")}</strong></div>
+                <div className="detail-row"><span>{t("serviceDetails.rating")}</span><strong>{ratingLabel}</strong></div>
               </div>
-
               <div className="purchase-actions">
-                {isOwner ? <>
-                    <Link to={`/services/${id}/edit`} className="button-primary purchase-button">
-
-                      <span>{t("serviceDetails.editService")}</span>
-                      <span className="arrow-badge">→</span>
-                    </Link>
-
-                    <button type="button" onClick={handleDelete} disabled={deleting} className="button-danger">
-
+                {isOwner ? (
+                  <>
+                    <Link to={`/services/${id}/edit`} className="button-primary purchase-button">{t("serviceDetails.editService")}</Link>
+                    <button type="button" className="button-danger" disabled={deleting} onClick={deleteService}>
                       {deleting ? t("serviceDetails.deleting") : t("serviceDetails.deleteService")}
                     </button>
-                  </> : currentUser ? <button type="button" onClick={handleOrder} disabled={ordering} className="button-primary purchase-button">
-
-                    <span>
-                      {ordering ? t("serviceDetails.creatingOrder") : t("serviceDetails.orderService")}
-                    </span>
-                    {!ordering && <span className="arrow-badge">→</span>}
-                  </button> : <Link to="/sign-in" className="button-primary purchase-button">
-
-                    <span>
-                      {t("serviceDetails.signInToOrder")}
-                    </span>
-                    <span className="arrow-badge">→</span>
-                  </Link>}
-              </div>
-
-              <div className="secure-note">
-                <span>🔒</span>
-                {t("serviceDetails.secureTransactionThroughINJAZ")}
+                  </>
+                ) : currentUser ? (
+                  <button type="button" className="button-primary purchase-button" disabled={ordering} onClick={orderService}>
+                    {ordering ? t("serviceDetails.creatingOrder") : t("serviceDetails.orderService")}
+                  </button>
+                ) : (
+                  <Link to="/sign-in" className="button-primary purchase-button">{t("serviceDetails.signInToOrder")}</Link>
+                )}
               </div>
             </div>
           </aside>
         </div>
-
-        <section className="cta-panel">
-          <div className="cta-copy">
-            <p>
-              {t("serviceDetails.readyToMakeItHappen")}
-            </p>
-            <h2>
-              {t("serviceDetails.letAposSBuildSomethingGreat")}
-            </h2>
-          </div>
-
-          <button type="button" className="button-primary cta-button" onClick={() => {
-          if (currentUser) {
-            handleOrder();
-          } else {
-            navigate("/sign-in");
-          }
-        }}>
-
-            {t("serviceDetails.startProject")}
-            <span className="arrow-badge">→</span>
-          </button>
-        </section>
       </div>
-    </main>;
+    </main>
+  );
 }
+
 export default ServiceDetailsPage;

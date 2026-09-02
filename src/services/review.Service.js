@@ -1,8 +1,14 @@
 import api from './api'
 
 
-async function getReviewByService(serviceId){
-    const response = await api.get(`/reviews/service/${serviceId}`)
+async function getReviewByService(serviceId, options = {}){
+    const response = await api.get(`/reviews/service/${serviceId}`, {
+        params: {
+            page: options.page || 1,
+            limit: options.limit || 5,
+            sort: options.sort || "recent"
+        }
+    })
     return response.data
 }
 
@@ -39,4 +45,3 @@ export {
     updateReview,
     deleteReview
 }
-
