@@ -6,6 +6,7 @@ import { getReviewByService } from "../services/review.Service";
 import RatingStars from "../components/RatingStars";
 import Icon from "../components/Icon";
 import PageLoader from "../components/loading-ui/Loading";
+import ReportModal from "../components/ReportModal";
 
 const API_URL = "http://localhost:3000";
 
@@ -29,6 +30,9 @@ function ServiceDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [ordering, setOrdering] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+  const [reportTarget, setReportTarget] = useState(null);
+  const [reportNotice, setReportNotice] = useState("");
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -47,6 +51,7 @@ function ServiceDetailsPage() {
         const serviceData = await serviceResponse.json();
         if (!active) return;
         setService(serviceData);
+        setActiveImage(0);
         setReviews(reviewData.reviews || []);
         setReviewSummary(reviewData.summary || {
           averageRating: 0,
@@ -99,6 +104,11 @@ function ServiceDetailsPage() {
     })),
     [reviewSummary],
   );
+  const images = service?.images || [];
+
+  function moveGallery(direction) {
+    setActiveImage(current => (current + direction + images.length) % images.length);
+  }
 
   async function loadMoreReviews() {
     try {
@@ -187,15 +197,22 @@ function ServiceDetailsPage() {
 
         {error && <div className="service-error" role="alert">{error}</div>}
 
-        {service.images?.length > 0 && (
-          <section className="hero-gallery">
+        {images.length > 0 && (
+          <section className="hero-gallery" tabIndex="0" onKeyDown={event => { if (event.key === "ArrowLeft") moveGallery(-1); if (event.key === "ArrowRight") moveGallery(1); }} aria-label={t("serviceDetails.imageGallery", { defaultValue: "Service image gallery" })}>
             <div className="hero-gallery-main">
-              <img src={service.images[0]} alt={service.title} />
+              <img src={images[activeImage]} alt={`${service.title} — ${activeImage + 1}`} />
+              {images.length > 1 && <>
+                <button type="button" className="gallery-control gallery-previous" onClick={() => moveGallery(-1)} aria-label={t("serviceDetails.previousImage", { defaultValue: "Previous image" })}>‹</button>
+                <button type="button" className="gallery-control gallery-next" onClick={() => moveGallery(1)} aria-label={t("serviceDetails.nextImage", { defaultValue: "Next image" })}>›</button>
+                <span className="gallery-index" aria-live="polite">{activeImage + 1} / {images.length}</span>
+              </>}
             </div>
-            {service.images.length > 1 && (
+            {images.length > 1 && (
               <div className="hero-gallery-thumbs">
-                {service.images.slice(1, 4).map((image, index) => (
-                  <img key={image} src={image} alt={`${service.title} ${index + 2}`} />
+                {images.map((image, index) => (
+                  <button type="button" key={`${image}-${index}`} className={activeImage === index ? "active" : ""} onClick={() => setActiveImage(index)} aria-label={t("serviceDetails.showImage", { defaultValue: `Show image ${index + 1}` })} aria-current={activeImage === index ? "true" : undefined}>
+                    <img src={image} alt="" />
+                  </button>
                 ))}
               </div>
             )}
@@ -312,6 +329,7 @@ function ServiceDetailsPage() {
                           </time>
                         </header>
                         <p>{review.comment || t("serviceDetails.noWrittenComment", { defaultValue: "No written comment." })}</p>
+                        {String(review.reviewer?._id || "") !== currentUserId && <button type="button" className="report-link" onClick={() => setReportTarget({ type: "REVIEW", id: review._id, label: t("reports.review", { defaultValue: "review" }) })}>{t("reports.report", { defaultValue: "Report" })}</button>}
                       </article>
                     );
                   })}
@@ -351,10 +369,13 @@ function ServiceDetailsPage() {
                   <Link to="/sign-in" className="button-primary purchase-button">{t("serviceDetails.signInToOrder")}</Link>
                 )}
               </div>
+              {!isOwner && <button type="button" className="report-link report-service-link" onClick={() => setReportTarget({ type: "SERVICE", id: service._id, label: service.title })}>{t("reports.reportService", { defaultValue: "Report service" })}</button>}
             </div>
           </aside>
         </div>
       </div>
+      {reportNotice && <div className="report-toast" role="status">{reportNotice}</div>}
+      <ReportModal open={Boolean(reportTarget)} targetType={reportTarget?.type} targetId={reportTarget?.id} targetLabel={reportTarget?.label} onClose={() => setReportTarget(null)} onSubmitted={setReportNotice} />
     </main>
   );
 }
