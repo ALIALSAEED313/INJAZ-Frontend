@@ -9,6 +9,8 @@ import AdminServices from "../../components/Admin/AdminServices";
 import AdminOrders from "../../components/Admin/AdminOrders";
 import AdminReviews from "../../components/Admin/AdminReviews";
 import DeleteConfirm from "../../components/Admin/DeleteConfirm";
+import AdminReports from "../../components/Admin/AdminReports";
+import { getReports, updateReportStatus } from "../../services/reportService";
 function AdminDashboard() {
   const {
     t
@@ -21,6 +23,7 @@ function AdminDashboard() {
   const [services, setServices] = useState([]);
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeSection, setActiveSection] = useState("overview");
@@ -39,12 +42,13 @@ function AdminDashboard() {
   useEffect(() => {
     async function fetchAdminData() {
       try {
-        const [statsData, usersData, servicesData, ordersData, reviewsData] = await Promise.all([getAdminStats(), getUsers(), getServices(), getOrders(), getReviews()]);
+        const [statsData, usersData, servicesData, ordersData, reviewsData, reportsData] = await Promise.all([getAdminStats(), getUsers(), getServices(), getOrders(), getReviews(), getReports()]);
         setStats(statsData);
         setUsers(usersData);
         setServices(servicesData);
         setOrders(ordersData);
         setReviews(reviewsData);
+        setReports(reportsData);
       } catch (err) {
         console.error("Error loading admin dashboard:", err);
         setError(t("adminDashboard.failedToLoadAdminDashboard"));
@@ -170,6 +174,16 @@ function AdminDashboard() {
     }
     setDeleteConfirm(null);
   }
+  async function handleReportStatus(reportId, status) {
+    try {
+      const updated = await updateReportStatus(reportId, status);
+      setReports(current => current.map(report => report._id === reportId ? { ...report, ...updated } : report));
+      setMessage({ type: "success", text: t("adminDashboard.reportUpdated", { defaultValue: "Report status updated." }) });
+    } catch (err) {
+      console.error("Error updating report:", err);
+      setMessage({ type: "error", text: t("adminDashboard.reportUpdateFailed", { defaultValue: "Unable to update report status." }) });
+    }
+  }
   const filteredUsers = users.filter(user => {
     const search = userSearch.toLowerCase();
     const matchesSearch = user.username?.toLowerCase().includes(search) || user.name?.toLowerCase().includes(search) || user.email?.toLowerCase().includes(search);
@@ -219,6 +233,7 @@ function AdminDashboard() {
         <button type="button" className={activeSection === "orders" ? "active" : ""} aria-pressed={activeSection === "orders"} onClick={() => setActiveSection("orders")}>{t("adminDashboard.orders")}</button>
 
         <button type="button" className={activeSection === "reviews" ? "active" : ""} aria-pressed={activeSection === "reviews"} onClick={() => setActiveSection("reviews")}>{t("adminDashboard.reviews")}</button>
+        <button type="button" className={activeSection === "reports" ? "active" : ""} aria-pressed={activeSection === "reports"} onClick={() => setActiveSection("reports")}>{t("adminReports.title", { defaultValue: "Reports" })}{reports.some(report => report.status === "OPEN") ? ` (${reports.filter(report => report.status === "OPEN").length})` : ""}</button>
       </nav>
 
       <DeleteConfirm deleteConfirm={deleteConfirm} handleConfirmDelete={handleConfirmDelete} setDeleteConfirm={setDeleteConfirm} />
@@ -232,6 +247,7 @@ function AdminDashboard() {
       {activeSection === "orders" && <AdminOrders orders={orders} filteredOrders={filteredOrders} orderSearch={orderSearch} setOrderSearch={setOrderSearch} orderStatusFilter={orderStatusFilter} setOrderStatusFilter={setOrderStatusFilter} orderStatuses={orderStatuses} setDeleteConfirm={setDeleteConfirm} />}
 
       {activeSection === "reviews" && <AdminReviews reviews={reviews} filteredReviews={filteredReviews} reviewSearch={reviewSearch} setReviewSearch={setReviewSearch} reviewRatingFilter={reviewRatingFilter} setReviewRatingFilter={setReviewRatingFilter} setDeleteConfirm={setDeleteConfirm} />}
+      {activeSection === "reports" && <AdminReports reports={reports} onStatusChange={handleReportStatus} />}
     </main>;
 }
 export default AdminDashboard;

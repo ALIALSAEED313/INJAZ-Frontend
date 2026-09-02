@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router";
 import Navbar from "./components/Navbar";
+import SupportWidget from "./components/SupportWidget";
 import SignupPage from "./pages/SignupPage";
 import Homepage from "./pages/Homepage";
 import SignInPage from "./pages/SigninPage";
@@ -201,6 +202,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </main>
+      <SupportWidget />
       <Footer />
     </div>
   );

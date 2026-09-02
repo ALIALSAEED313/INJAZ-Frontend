@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { getProfile } from "../../services/profile.Service";
@@ -7,6 +7,8 @@ import { getReviewsForFreelancer } from "../../services/review.Service";
 import ProfileServices from "../../components/Profile/ProfileServices";
 import ProfileReviews from "../../components/Profile/ProfileReviews";
 import PageLoader from "../../components/loading-ui/Loading";
+import Icon from "../../components/Icon";
+import ReportModal from "../../components/ReportModal";
 function ProfilePage() {
   const {
     t
@@ -22,6 +24,10 @@ function ProfilePage() {
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(() => id ? localStorage.getItem(`favorite-profile-${id}`) === "true" : false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportNotice, setReportNotice] = useState("");
+  const menuRef = useRef(null);
+  const menuTriggerRef = useRef(null);
   const isOwnProfile = profile && currentUserId && String(profile._id) === String(currentUserId);
   useEffect(() => {
     async function fetchProfileData() {
@@ -42,6 +48,31 @@ function ProfilePage() {
     }
     fetchProfileData();
   }, [id, t]);
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+    const menu = menuRef.current;
+    const items = menu?.querySelectorAll('[role="menuitem"]') || [];
+    items[0]?.focus();
+    function handleMenuEvent(event) {
+      if (event.type === "mousedown" && menu && !menu.contains(event.target)) setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuTriggerRef.current?.focus();
+      }
+      if ((event.key === "ArrowDown" || event.key === "ArrowUp") && items.length) {
+        event.preventDefault();
+        const current = Array.from(items).indexOf(document.activeElement);
+        const direction = event.key === "ArrowDown" ? 1 : -1;
+        items[(current + direction + items.length) % items.length].focus();
+      }
+    }
+    document.addEventListener("mousedown", handleMenuEvent);
+    document.addEventListener("keydown", handleMenuEvent);
+    return () => {
+      document.removeEventListener("mousedown", handleMenuEvent);
+      document.removeEventListener("keydown", handleMenuEvent);
+    };
+  }, [menuOpen]);
   const averageRating = useMemo(() => {
     if (!reviews.length) return 0;
     const total = reviews.reduce((sum, review) => sum + Number(review.rating || 0), 0);
@@ -189,11 +220,11 @@ function ProfilePage() {
               <strong>
                 {reviews.length ? averageRating.toFixed(1) : "0.0"}
               </strong>
-              <span>({reviews.length || 0}{t("profile.reviews")}</span>
+              <span>({t("profile.reviewCount", { count: reviews.length })})</span>
             </div>
 
             <div className="profile-meta-row">
-              <span>📍 {profile.country || t("profile.locationNotShared")}</span>
+              <span className="profile-meta-location"><Icon name="location" size={16} /> {profile.country || t("profile.locationNotShared")}</span>
               <span>{t("profile.oined")}{" "}
                 {new Date(profile.createdAt).toLocaleDateString("en-US", {
                 month: "short",
@@ -211,20 +242,20 @@ function ProfilePage() {
                 {isOwnProfile ? t("profile.viewMyProfile") : t("profile.viewServices")}
               </Link>
 
-              <button type="button" className={`profile-icon-btn ${isFavorite ? "active" : ""}`} onClick={toggleFavorite} aria-label={t("profile.favoriteFreelancer")}>
+              <button type="button" className={`profile-icon-btn ${isFavorite ? "active" : ""}`} onClick={toggleFavorite} aria-label={t("profile.favoriteFreelancer")} aria-pressed={isFavorite}>
                 ♥
               </button>
 
               <button type="button" className="profile-icon-btn" onClick={handleShare}>{t("profile.share")}</button>
 
-              <div className="profile-menu-wrap">
-                <button type="button" className="profile-icon-btn menu" onClick={() => setMenuOpen(value => !value)} aria-label={t("profile.moreProfileActions")}>
-                  •••
+              <div className="profile-menu-wrap" ref={menuRef}>
+                <button ref={menuTriggerRef} type="button" className="profile-icon-btn menu" onClick={() => setMenuOpen(value => !value)} aria-label={t("profile.moreProfileActions")} aria-expanded={menuOpen} aria-controls="profile-actions-menu" aria-haspopup="menu">
+                  <Icon name="moreVertical" />
                 </button>
 
-                {menuOpen && <div className="profile-menu-panel">
-                    <button type="button" onClick={() => setMenuOpen(false)}>{t("profile.reportProfile")}</button>
-                    <button type="button" onClick={() => setMenuOpen(false)}>{t("profile.blockUser")}</button>
+                {menuOpen && <div className="profile-menu-panel" id="profile-actions-menu" role="menu">
+                    {!isOwnProfile && <button type="button" role="menuitem" className="danger" onClick={() => { setMenuOpen(false); setReportOpen(true); }}>{t("profile.reportProfile")}</button>}
+                    <button type="button" role="menuitem" onClick={() => setMenuOpen(false)}>{t("profile.blockUser")}</button>
                   </div>}
               </div>
             </div>
@@ -425,6 +456,8 @@ function ProfilePage() {
             </div>}
         </aside>
       </div>
+      {reportNotice && <div className="report-toast" role="status">{reportNotice}</div>}
+      <ReportModal open={reportOpen} targetType="USER" targetId={profile._id} targetLabel={profileName} onClose={() => setReportOpen(false)} onSubmitted={setReportNotice} />
     </main>;
 }
 export default ProfilePage;
