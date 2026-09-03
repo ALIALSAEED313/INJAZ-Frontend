@@ -173,12 +173,13 @@ function Navbar() {
         <div id="primary-menu" className={`navbar-links ${menuOpen ? "mobile-open" : ""}`} onClick={event => {
         if (event.target.closest("a")) setMenuOpen(false);
       }}>
+          <div className="nav-center-group">
           <div className="nav-primary-group">
             <Link to="/" className={navClass("/")} aria-current={location.pathname === "/" ? "page" : undefined}>{t("common.home")}</Link>
             <Link to="/services" className={navClass("/services")} aria-current={isActivePath("/services") ? "page" : undefined}>{t("common.services")}</Link>
           </div>
 
-          {user ? <>
+          {user &&
             <div className="nav-work-group">
               {user?.role === "admin" && <Link to="/admin" className={navClass("/admin")}>{t("navbar.admin")}</Link>}
               <Link to="/dashboard" className={navClass("/dashboard")}>{t("common.dashboard")}</Link>
@@ -191,7 +192,10 @@ function Navbar() {
 
               {user.isSeller && <Link to="/services/create" className={`nav-create-cta ${navClass("/services/create")}`} aria-current={isActivePath("/services/create") ? "page" : undefined}>{t("common.createService")}</Link>}
             </div>
+          }
+          </div>
 
+          {user ?
             <div className="nav-utility-group">
               <div className="settings-controls">
                 <button type="button" className="theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")} title={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")}>
@@ -275,8 +279,7 @@ function Navbar() {
                 </button>
                 {accountOpen && <div className="account-menu" id="account-menu"><div className="account-menu-identity"><strong dir="auto">{user?.username}</strong><span dir="ltr">{user?.email}</span></div><Link to="/my-profile">{t("common.viewProfile")}</Link>{user?.isSeller && <Link to="/payment-details">{t("navbar.paymentDetails")}</Link>}<button type="button" onClick={handleSignOut}>{t("common.signOut")}</button></div>}
               </div>
-            </div>
-            </> : <>
+            </div> :
               <div className="nav-utility-group nav-guest-utilities">
                 <div className="settings-controls">
                   <button type="button" className="theme-toggle" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} aria-label={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")} title={theme === "dark" ? t("common.switchToLightMode") : t("common.switchToDarkMode")}>
@@ -302,8 +305,7 @@ function Navbar() {
 
                 {t("common.signIn")}
               </button>
-              </div>
-            </>}
+              </div>}
         </div>
         </div>
       </nav>
