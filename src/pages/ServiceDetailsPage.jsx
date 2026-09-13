@@ -163,7 +163,12 @@ function ServiceDetailsPage() {
         body: JSON.stringify({ serviceId: service._id }),
       });
       const orderData = await orderResponse.json();
-      if (!orderResponse.ok) throw new Error(orderData.message || orderData.err);
+      if (!orderResponse.ok) {
+        const error = new Error(orderData.message || orderData.err || t("serviceDetails.orderFailed"));
+        error.status = orderResponse.status;
+        error.agreementRequired = Boolean(orderData.agreementRequired);
+        throw error;
+      }
       const orderId = orderData.order?._id;
 
       const paymentResponse = await fetch(`${API_URL}/payments/${orderId}`, {
@@ -176,7 +181,11 @@ function ServiceDetailsPage() {
       }
       window.location.assign(paymentData.paymentUrl);
     } catch (requestError) {
-      setError(requestError.message || t("serviceDetails.orderFailed"));
+      if (requestError.agreementRequired) {
+        navigate("/legal-agreements");
+      } else {
+        setError(requestError.message || t("serviceDetails.orderFailed"));
+      }
       setOrdering(false);
     }
   }
