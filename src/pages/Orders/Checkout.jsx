@@ -51,7 +51,12 @@ const Checkout = () => {
       setIsProcessing(false);
     } catch (err) {
       console.error(err);
-      alert('Checkout failed. Please try again.');
+      if (err.response?.data?.agreementRequired) {
+        setError(`${err.response.data.message} `);
+        navigate("/legal-agreements");
+      } else {
+        alert('Checkout failed. Please try again.');
+      }
       setIsProcessing(false);
     }
   };

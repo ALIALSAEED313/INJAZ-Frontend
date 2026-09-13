@@ -1000,7 +1000,11 @@
     "iAgreeToTheTermsAndPolicyAndWillComplyWithThem.": "I agree to the terms and policy and will comply with them.",
     "iAgree": "I Agree",
     "remindMeLater": "Remind me later",
-    "iAgreeToTheTermsAndPolicyAndWillComplyWithThem": "I agree to the terms and policy and will comply with them."
+    "iAgreeToTheTermsAndPolicyAndWillComplyWithThem": "I agree to the terms and policy and will comply with them.",
+    "iHaveReadAndAgreeToThe": "I have read and agree to the",
+    "buyerSellerAgreement": "Injaz Buyer & Seller Agreement",
+    "version": "(version",
+    "agreementUnavailable": "Unable to load the agreement right now."
   },
   "profileReviews": {
     "loadingReviews.": "Loading reviews...",

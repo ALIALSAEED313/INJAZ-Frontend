@@ -61,6 +61,7 @@ function OrderWorkspace() {
   const [existingReview, setExistingReview] = useState(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [confirmation, setConfirmation] = useState(null);
+  const [agreementSnapshot, setAgreementSnapshot] = useState(null);
 
   const headers = useMemo(() => ({
     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -611,6 +612,7 @@ function OrderWorkspace() {
                 <div><dt>{t("orderWorkspace.price")}</dt><dd>{order?.price} {t("orderWorkspace.bhd")}</dd></div>
                 <div><dt>{t("orderWorkspace.buyer")}</dt><dd>{order?.buyer?.username}</dd></div>
                 <div><dt>{t("orderWorkspace.seller")}</dt><dd>{order?.seller?.username}</dd></div>
+                {order?.agreementVersion && <div><dt>Buyer & Seller Agreement</dt><dd>Version {order.agreementVersion}{order?.agreement?.title ? ` · ${order.agreement.title}` : ""}{order?.agreement?._id ? <button type="button" className="link-btn" onClick={() => setAgreementSnapshot(order.agreement)}> View terms</button> : null}</dd></div>}
               </dl>
             </section>
 
@@ -656,6 +658,7 @@ function OrderWorkspace() {
         onCancel={() => setConfirmation(null)}
         onConfirm={removeReview}
       />
+      {agreementSnapshot && <div className="agreement-overlay" role="dialog" aria-modal="true"><section className="agreement-modal"><h2>{agreementSnapshot.title} · Version {agreementSnapshot.version || order?.agreementVersion}</h2><p className="legal-notice">Historical terms that applied when this order was created.</p><div className="agreement-content"><pre>{agreementSnapshot.content || "Full text unavailable for this historical version."}</pre></div><button className="ghost-btn" onClick={() => setAgreementSnapshot(null)}>Close</button></section></div>}
     </main>
   );
 }

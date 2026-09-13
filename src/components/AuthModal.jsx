@@ -4,6 +4,7 @@ import MorphingInfinity from "./loading-ui/morphing-infinity";
 import { useNavigate, Link } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import { signIn, signUp } from "../services/authService";
+import { getCurrentAgreement } from "../services/agreementService";
 const roleOptions = [{
   value: "seller",
   titleKey: "roleFreelancer",
@@ -34,6 +35,8 @@ function AuthModal({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [errors, setErrors] = useState({});
+  const [agreement, setAgreement] = useState(null);
+  const [agreementAccepted, setAgreementAccepted] = useState(false);
   const [formData, setFormData] = useState({
     identifier: "",
     username: "",
@@ -43,6 +46,7 @@ function AuthModal({
   });
   useEffect(() => {
     if (!isOpen) return;
+    getCurrentAgreement().then(setAgreement).catch(() => setAgreement(null));
     const handleEsc = event => {
       if (event.key === "Escape") onClose();
     };
@@ -171,10 +175,13 @@ function AuthModal({
         email: formData.email,
         password: formData.password,
         passwordConf: formData.confirmPassword,
-        isSeller: selectedRole === "seller"
+        isSeller: selectedRole === "seller",
+        agreementId: agreement?._id,
+        agreementAccepted: agreement ? agreementAccepted : undefined
       });
       setSuccess(t("authModal.accountCreatedSuccessfullyYouCanSignIn"));
       setMode("sign-in");
+      setAgreementAccepted(false);
       setFormData({
         identifier: formData.email,
         username: "",
@@ -339,12 +346,14 @@ function AuthModal({
                 </div>
                 {errors.confirmPassword && <span className="field-error">{errors.confirmPassword}</span>}
 
+                {agreement ? <label className="agreement-check"><input type="checkbox" checked={agreementAccepted} onChange={e => setAgreementAccepted(e.target.checked)} required /> <span>{t("authModal.iHaveReadAndAgreeToThe")} <Link to="/legal-agreements" target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()}>{t("authModal.buyerSellerAgreement")}</Link> {t("authModal.version", { defaultValue: "(version" })} {agreement.version}).</span></label> : null}
+
                 {errors.submit && <div className="form-alert form-alert-error">
                     {errors.submit}
                   </div>}
                 {success && <div className="form-alert form-alert-success">{success}</div>}
 
-                <button type="submit" className="primary-cta" disabled={loading}>
+                <button type="submit" className="primary-cta" disabled={loading || Boolean(agreement && !agreementAccepted)}>
                   {loading ? <MorphingInfinity className="size-20" /> : t("authModal.createAccount")}
                 </button>
 

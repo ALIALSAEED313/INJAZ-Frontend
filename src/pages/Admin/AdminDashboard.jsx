@@ -10,6 +10,8 @@ import AdminOrders from "../../components/Admin/AdminOrders";
 import AdminReviews from "../../components/Admin/AdminReviews";
 import DeleteConfirm from "../../components/Admin/DeleteConfirm";
 import AdminReports from "../../components/Admin/AdminReports";
+import AdminAgreements from "../../components/Admin/AdminAgreements";
+import { getAdminAgreements } from "../../services/agreementService";
 import { getReports, updateReportStatus } from "../../services/reportService";
 function AdminDashboard() {
   const {
@@ -24,6 +26,7 @@ function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [reports, setReports] = useState([]);
+  const [agreements, setAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeSection, setActiveSection] = useState("overview");
@@ -42,13 +45,14 @@ function AdminDashboard() {
   useEffect(() => {
     async function fetchAdminData() {
       try {
-        const [statsData, usersData, servicesData, ordersData, reviewsData, reportsData] = await Promise.all([getAdminStats(), getUsers(), getServices(), getOrders(), getReviews(), getReports()]);
+        const [statsData, usersData, servicesData, ordersData, reviewsData, reportsData, agreementData] = await Promise.all([getAdminStats(), getUsers(), getServices(), getOrders(), getReviews(), getReports(), getAdminAgreements()]);
         setStats(statsData);
         setUsers(usersData);
         setServices(servicesData);
         setOrders(ordersData);
         setReviews(reviewsData);
         setReports(reportsData);
+        setAgreements(agreementData);
       } catch (err) {
         console.error("Error loading admin dashboard:", err);
         setError(t("adminDashboard.failedToLoadAdminDashboard"));
@@ -234,6 +238,7 @@ function AdminDashboard() {
 
         <button type="button" className={activeSection === "reviews" ? "active" : ""} aria-pressed={activeSection === "reviews"} onClick={() => setActiveSection("reviews")}>{t("adminDashboard.reviews")}</button>
         <button type="button" className={activeSection === "reports" ? "active" : ""} aria-pressed={activeSection === "reports"} onClick={() => setActiveSection("reports")}>{t("adminReports.title", { defaultValue: "Reports" })}{reports.some(report => report.status === "OPEN") ? ` (${reports.filter(report => report.status === "OPEN").length})` : ""}</button>
+        <button type="button" className={activeSection === "legal" ? "active" : ""} aria-pressed={activeSection === "legal"} onClick={() => setActiveSection("legal")}>Legal</button>
       </nav>
 
       <DeleteConfirm deleteConfirm={deleteConfirm} handleConfirmDelete={handleConfirmDelete} setDeleteConfirm={setDeleteConfirm} />
@@ -248,6 +253,7 @@ function AdminDashboard() {
 
       {activeSection === "reviews" && <AdminReviews reviews={reviews} filteredReviews={filteredReviews} reviewSearch={reviewSearch} setReviewSearch={setReviewSearch} reviewRatingFilter={reviewRatingFilter} setReviewRatingFilter={setReviewRatingFilter} setDeleteConfirm={setDeleteConfirm} />}
       {activeSection === "reports" && <AdminReports reports={reports} onStatusChange={handleReportStatus} />}
+      {activeSection === "legal" && <AdminAgreements agreements={agreements} onChange={updated => setAgreements(current => current.some(a => a._id === updated._id) ? current.map(a => a._id === updated._id ? updated : a) : [updated, ...current])} />}
     </main>;
 }
 export default AdminDashboard;

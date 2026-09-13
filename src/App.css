@@ -1,0 +1,26 @@
+/* Buyer & Seller Agreement */
+.agreement-overlay { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 1rem; background: rgba(13, 27, 19, .66); }
+.agreement-modal { width: min(760px, 100%); max-height: calc(100vh - 2rem); overflow: auto; padding: 1.5rem; border-radius: 16px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.28); }
+.agreement-content, .legal-document, .agreement-preview { white-space: pre-wrap; border: 1px solid #dbe5dd; border-radius: 10px; padding: 1rem; background: #fbfdfb; }
+.agreement-content { max-height: 42vh; overflow: auto; margin: 1rem 0; }
+.agreement-content pre, .legal-document pre, .agreement-preview pre { white-space: pre-wrap; font: inherit; margin: 0; line-height: 1.65; }
+.agreement-check { display: block; margin: 1rem 0; }
+.legal-page { max-width: 900px; margin: 2rem auto; padding: 1.5rem; }
+.legal-status { margin: 1rem 0; padding: .85rem 1rem; border-left: 4px solid #1ba84c; background: #f0f9f2; }
+.admin-agreements { padding: 1.25rem; background: #fff; border-radius: 12px; }
+.admin-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.admin-table th, .admin-table td { padding: .75rem; border-bottom: 1px solid #e3e8e4; text-align: left; }
+.admin-table button { margin: .15rem; }
+.agreement-editor { display: grid; gap: .75rem; padding: 1rem; margin-top: 1rem; background: #f5f8f6; border-radius: 10px; }
+.agreement-editor input, .agreement-editor textarea { width: 100%; padding: .65rem; border: 1px solid #cbd8ce; border-radius: 6px; box-sizing: border-box; }
+.agreement-editor textarea { min-height: 280px; resize: vertical; }
+.agreement-preview { margin-top: 1rem; max-height: 70vh; overflow: auto; }
+.agreement-status { display: inline-block; padding: .15rem .6rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+.agreement-status-published { background: #e3f5e8; color: #167a3a; }
+.agreement-status-draft { background: #f2f4f0; color: #6b6f66; }
+.agreement-status-archived { background: #f7e8e8; color: #a13b3b; }
+.agreement-current { margin: .5rem 0; padding: .5rem .75rem; border: 1px solid #cfe3d3; border-radius: 8px; background: #eef8f0; }
+.legal-notice { margin: .25rem 0 .75rem; padding: .55rem .75rem; border: 1px solid #e2cba2; border-radius: 8px; background: #fbf3e6; color: #7a5b1d; font-size: .78rem; }
+.legal-meta { margin: .25rem 0 .5rem; color: var(--muted, #6f625c); font-size: .85rem; }
+.legal-history { margin-top: 1.5rem; }
+@media (max-width: 700px) { .admin-table { display: block; overflow-x: auto; } }

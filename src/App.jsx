@@ -25,6 +25,8 @@ import NotFoundPage from "./pages/NotFoundPage";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import PolicyAgreementModal from "./components/PolicyAgreementModal";
+import AgreementGate from "./components/AgreementGate";
+import LegalAgreementsPage from "./pages/LegalAgreementsPage";
 import PaymentCallback from "./pages/PaymentCallback";
 import PaymentDetailsPage from "./pages/PaymentDetailsPage";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -92,6 +94,7 @@ function App() {
   return (
     <div className="app-container">
       <PolicyAgreementGate />
+      <AgreementGate />
       <Navbar />
       <main className="main-content">
         <Routes>
@@ -159,6 +162,7 @@ function App() {
           <Route path="/services/:id" element={<ServiceDetailsPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
+          <Route path="/legal-agreements" element={<ProtectedRoute><LegalAgreementsPage /></ProtectedRoute>} />
           <Route
             path="/services/create"
             element={
