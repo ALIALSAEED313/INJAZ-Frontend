@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { signUp } from "../services/authService";
 import CatMascot from "../components/CatMascot";
+import { getCurrentAgreement } from "../services/agreementService";
 function Signup() {
   const {
     t
@@ -17,6 +19,9 @@ function Signup() {
     accountType: "buyer"
   });
   const [submitting, setSubmitting] = useState(false);
+  const [agreement, setAgreement] = useState(null);
+  const [agreementAccepted, setAgreementAccepted] = useState(false);
+  useEffect(() => { getCurrentAgreement().then(setAgreement).catch(() => setAgreement(null)); }, []);
   const {
     username,
     email,
@@ -48,6 +53,8 @@ function Signup() {
         password,
         passwordConf,
         isSeller: accountType === "seller"
+        , agreementId: agreement?._id
+        , agreementAccepted: agreement ? agreementAccepted : undefined
       });
       navigate("/sign-in");
     } catch (err) {
@@ -56,7 +63,7 @@ function Signup() {
     }
   }
   function isFormInvalid() {
-    return !(username && email && password && password === passwordConf);
+    return !(username && email && password && password === passwordConf && (!agreement || agreementAccepted));
   }
   return <main className="auth-page">
       <div className="auth-shell auth-shell-signup">
@@ -121,10 +128,10 @@ function Signup() {
                 {t("common.cancel")}
               </button>
             </div>
+            {agreement && <label className="agreement-check"><input type="checkbox" checked={agreementAccepted} onChange={e => setAgreementAccepted(e.target.checked)} required /> I have read and agree to the <a href="/legal-agreements" target="_blank" rel="noreferrer">Injaz Buyer & Seller Agreement</a> (version {agreement.version}).</label>}
           </form>
         </div>
       </div>
     </main>;
 }
 export default Signup;
-import { useTranslation } from "react-i18next";

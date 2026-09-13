@@ -1004,7 +1004,11 @@
     "iAgreeToTheTermsAndPolicyAndWillComplyWithThem.": "أوافق على الشروط والسياسة وسألتزم بهما.",
     "iAgree": "أوافق",
     "remindMeLater": "ذكّرني لاحقًا",
-    "iAgreeToTheTermsAndPolicyAndWillComplyWithThem": "أوافق على الشروط والسياسة وسألتزم بهما."
+    "iAgreeToTheTermsAndPolicyAndWillComplyWithThem": "أوافق على الشروط والسياسة وسألتزم بهما.",
+    "iHaveReadAndAgreeToThe": "لقد قرأت وأوافق على",
+    "buyerSellerAgreement": "اتفاقية المشتري والبائع في إنجاز",
+    "version": "(الإصدار",
+    "agreementUnavailable": "تعذر تحميل الاتفاقية الآن."
   },
   "profileReviews": {
     "loadingReviews.": "جارٍ تحميل المراجعات...",
